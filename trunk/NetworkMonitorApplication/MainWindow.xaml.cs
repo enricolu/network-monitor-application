@@ -29,31 +29,27 @@ namespace NetworkMonitorApplication
             InitializeComponent();
 			monitor = new NetworkMonitor.NetworkMonitor();
 			monitor.PacketReceived += new PacketReceivedEventHandler(monitor_PacketReceived);
-			dataGridPackets.ItemsSource = monitor.Packets;
+            dataGridPackets.ItemsSource = monitor.Packets;
+            statusBar.DataContext = monitor;
 
             Thread t = new Thread(() =>
                 {
-                    
                     monitor.StartListening();                  
                 });
+
             t.Start();
         }
 		
 		private void monitor_PacketReceived(object sender, Packet p)
 		{
-            //Thread t = new Thread(() =>
-            //    {
-		            DispatcherOperation disOp =
-		                dataGridPackets.Dispatcher.BeginInvoke(
-		                    DispatcherPriority.Normal, new Action(() =>
-		                                                            {
-		                                                                dataGridPackets.Items.
-		                                                                    Refresh();
-		                                                            }));
-            Thread.Sleep(10);
-            //    });
-            //t.Start();
+            DispatcherOperation disOp =
+                dataGridPackets.Dispatcher.BeginInvoke(
+                    DispatcherPriority.Normal, new Action(() =>
+                        {
+                            dataGridPackets.Items.Refresh();
+                        }));
 
+            Thread.Sleep(10);
 		}
     }
 }
