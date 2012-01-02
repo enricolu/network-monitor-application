@@ -1,0 +1,54 @@
+﻿<Window x:Class="NetworkMonitorApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" Title="MainWindow" Width="700" Height="450">
+    <Grid>
+    	<TabControl Margin="0">
+    		<TabItem x:Name="tabItemPackets" Header="Packets">
+    			<WrapPanel Background="#FFE5E5E5" Orientation="Vertical">
+                    <DataGrid x:Name="dataGridPackets" AutoGenerateColumns="False"
+                        IsReadOnly="True" 
+                        xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+                    <DataGrid.Resources>
+                            <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"
+                                ObjectType="{x:Type sys:Enum}">
+                                <ObjectDataProvider.MethodParameters>
+                                    <x:Type Type="NetworkMonitor:IpProtocol" />
+                                </ObjectDataProvider.MethodParameters>
+                            </ObjectDataProvider>
+                            <ObjectDataProvider x:Key="directionEnum" MethodName="GetValues"
+                                ObjectType="{x:Type sys:Enum}">
+                                <ObjectDataProvider.MethodParameters>
+                                    <x:Type Type="NetworkMonitor:PacketDirection" />
+                                </ObjectDataProvider.MethodParameters>
+                            </ObjectDataProvider>
+                        </DataGrid.Resources>
+
+                        <!--The Columns-->
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Time"
+                                Binding="{Binding ArrivalTime}" />
+                            <DataGridTextColumn Header="Source IP" 
+						        Binding="{Binding IpHeader.SourceIpAddress}" />
+						    <DataGridTextColumn Header="Destination IP" 
+							    Binding="{Binding IpHeader.DestinationIpAddress}" />
+                            <DataGridComboBoxColumn Header="Protocol"
+                                SelectedItemBinding="{Binding Path=IpHeader.Protocol, Mode=OneWay}"  
+                                ItemsSource="{Binding Source={StaticResource protocolEnum}}" />
+                            <DataGridTextColumn Header="Size"
+                                Binding="{Binding Size}" />  
+                            <DataGridComboBoxColumn Header="Direction"
+                                SelectedItemBinding="{Binding Path=PacketDirection, Mode=OneWay}"
+                                ItemsSource="{Binding Source={StaticResource directionEnum}}" />
+                        </DataGrid.Columns>
+					
+					</DataGrid>
+    			</WrapPanel>
+    		</TabItem>
+    		<TabItem x:Name="tabItemStatistics" Header="Statistics">
+    			<Grid Background="#FFE5E5E5"/>
+    		</TabItem>
+    	</TabControl>
+        
+    </Grid>
+</Window>

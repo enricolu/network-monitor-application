@@ -1,0 +1,7 @@
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\bin\Debug\NetworkMonitorTest.exe
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\bin\Debug\NetworkMonitorTest.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\bin\Debug\NetworkMonitor.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\bin\Debug\NetworkMonitor.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\obj\x86\Debug\NetworkMonitorTest.exe
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorTest\obj\x86\Debug\NetworkMonitorTest.pdb

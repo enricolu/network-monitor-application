@@ -1,0 +1,6 @@
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NetworkMonitor.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NetworkMonitor.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\ResolveAssemblyReference.cache
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\NetworkMonitor.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\NetworkMonitor.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NmExtension.dll
