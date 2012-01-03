@@ -80,10 +80,13 @@ namespace NetworkMonitor
                     {
                         SerializePackets(PACKET_BUFFER);
                     }
-
-                    //Thread.Sleep(10);
                 }
             }
+        }
+
+        public void PauseListening()
+        {
+            protocolList.Stop();
         }
 
         public List<Adapter> GetAdapters()

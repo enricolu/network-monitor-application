@@ -23,6 +23,7 @@ namespace NetworkMonitorApplication
     public partial class MainWindow : Window
     {
 		private NetworkMonitor.NetworkMonitor monitor;
+        private bool isActivated = false;
 		
         public MainWindow()
         {
@@ -31,25 +32,49 @@ namespace NetworkMonitorApplication
 			monitor.PacketReceived += new PacketReceivedEventHandler(monitor_PacketReceived);
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
-
-            Thread t = new Thread(() =>
-                {
-                    monitor.StartListening();                  
-                });
-
-            t.Start();
         }
 		
 		private void monitor_PacketReceived(object sender, Packet p)
 		{
-            DispatcherOperation disOp =
-                dataGridPackets.Dispatcher.BeginInvoke(
-                    DispatcherPriority.Normal, new Action(() =>
-                        {
-                            dataGridPackets.Items.Refresh();
-                        }));
+            if (isActivated)
+            {
+                DispatcherOperation disOp =
+                    dataGridPackets.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Normal, new Action(() =>
+                            {
+                                dataGridPackets.Items.Refresh();
+                            }));
 
-            Thread.Sleep(10);
+                Thread.Sleep(10);
+            }
 		}
+
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            Thread t = new Thread(() =>
+            {
+                monitor.StartListening();
+            });
+
+            t.Start();
+        }
+
+        private void btnPause_Click(object sender, RoutedEventArgs e)
+        {
+            monitor.PauseListening();
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            if(!isActivated)
+            {
+                isActivated = true;
+            }
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            isActivated = false;
+        }
     }
 }
