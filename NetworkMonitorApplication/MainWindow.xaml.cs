@@ -55,6 +55,7 @@ namespace NetworkMonitorApplication
             {
                 monitor.StartListening();
             });
+            t.IsBackground = true;
 
             t.Start();
         }
@@ -75,6 +76,12 @@ namespace NetworkMonitorApplication
         private void Window_Deactivated(object sender, EventArgs e)
         {
             isActivated = false;
+        }
+
+        private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Packet selectedPacket = this.monitor.Packets[this.dataGridPackets.SelectedIndex];
+            panelPacketInformation.DataContext = selectedPacket;
         }
     }
 }
