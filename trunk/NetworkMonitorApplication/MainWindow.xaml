@@ -1,6 +1,24 @@
 ﻿<Window x:Class="NetworkMonitorApplication.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" Title="MainWindow" Width="700" Height="450" Activated="Window_Activated" Deactivated="Window_Deactivated">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" 
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        Title="MainWindow" Width="700" Height="450" Activated="Window_Activated" 
+        Deactivated="Window_Deactivated">
+    <Window.Resources>
+        <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"
+                                ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="NetworkMonitor:IpProtocol" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="directionEnum" MethodName="GetValues"
+                                ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="NetworkMonitor:PacketDirection" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
     <Grid>
         <ToolBar HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="48">
             <Button x:Name="btnStart" Click="btnStart_Click">
@@ -12,26 +30,9 @@
         </ToolBar>
     	<TabControl Margin="0,48,0,25">
     		<TabItem x:Name="tabItemPackets" Header="Packets">
-    			<WrapPanel Background="#FFE5E5E5" Orientation="Vertical">
+    			<WrapPanel Background="#FFE5E5E5" Orientation="Horizontal">
                     <DataGrid x:Name="dataGridPackets" AutoGenerateColumns="False"
-                        IsReadOnly="True" 
-                        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                        ItemsSource="{Binding Packets}">
-
-                    <DataGrid.Resources>
-                            <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"
-                                ObjectType="{x:Type sys:Enum}">
-                                <ObjectDataProvider.MethodParameters>
-                                    <x:Type Type="NetworkMonitor:IpProtocol" />
-                                </ObjectDataProvider.MethodParameters>
-                            </ObjectDataProvider>
-                            <ObjectDataProvider x:Key="directionEnum" MethodName="GetValues"
-                                ObjectType="{x:Type sys:Enum}">
-                                <ObjectDataProvider.MethodParameters>
-                                    <x:Type Type="NetworkMonitor:PacketDirection" />
-                                </ObjectDataProvider.MethodParameters>
-                            </ObjectDataProvider>
-                        </DataGrid.Resources>
+                        IsReadOnly="True" ItemsSource="{Binding Packets}" MouseDown="dataGridPackets_MouseDown">
 
                         <!--The Columns-->
                         <DataGrid.Columns>
@@ -52,6 +53,28 @@
                         </DataGrid.Columns>
 					
 					</DataGrid>
+                    
+                    <StackPanel Orientation="Vertical" x:Name="panelPacketInformation"
+                        Margin="20, 0, 0, 0">
+                        <Label>Packet Information:</Label>
+                        <TextBlock Text="{Binding StringFormat={}Source IP: {0},
+                            Path=IpHeader.SourceIpAddress}" />
+                        <TextBlock Text="{Binding StringFormat={}Destination IP: {0},
+                            Path=IpHeader.DestinationIpAddress}" />
+                        <TextBlock Text="{Binding StringFormat={}Source MAC: {0},
+                            Path=EthernetHeader.SourceMacAddress}" />
+                        <TextBlock Text="{Binding StringFormat={}Destination MAC: {0},
+                            Path=EthernetHeader.DestinationMacAddress}" />
+                        <TextBlock Text="{Binding StringFormat={}Remote Host: {0},
+                            Path=HostName}" />
+                        <TextBlock Text="{Binding StringFormat={}Size: {0} bytes,
+                            Path=Size}" />
+                        <TextBlock Text="{Binding StringFormat={}Protocol: {0},
+                            Path=IpHeader.Protocol}" />
+                        <TextBlock Text="{Binding StringFormat={}Direction: {0},
+                            Path=PacketDirection}" />
+                        
+                    </StackPanel>
     			</WrapPanel>
     		</TabItem>
     		<TabItem x:Name="tabItemStatistics" Header="Statistics">

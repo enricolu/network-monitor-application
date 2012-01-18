@@ -1,5 +1,0 @@
-<Modules>
-  <Module PersistentId="1B64CC3F-9B0D-4B14-804F-EA8F957D052E" ModuleId="NetworkMonitorApplication" />
-  <Module PersistentId="31E0FF4D-16EC-4FBA-BB74-9BD1298A82FC" ModuleId="NetworkMonitor" />
-  <Module PersistentId="80726673-764D-4AB9-AD11-80743A42A7E2" ModuleId="NetworkMonitorTest" />
-</Modules>
