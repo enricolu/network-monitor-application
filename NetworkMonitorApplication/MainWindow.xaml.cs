@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -7,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -14,6 +16,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using NetworkMonitor;
+using ContextMenu = System.Windows.Forms.ContextMenu;
+using MenuItem = System.Windows.Forms.MenuItem;
+using MessageBox = System.Windows.MessageBox;
+using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
 
 namespace NetworkMonitorApplication
 {
@@ -24,6 +30,7 @@ namespace NetworkMonitorApplication
     {
 		private NetworkMonitor.NetworkMonitor monitor;
         private bool isActivated = false;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
 		
         public MainWindow()
         {
@@ -32,6 +39,28 @@ namespace NetworkMonitorApplication
 			monitor.PacketReceived += new PacketReceivedEventHandler(monitor_PacketReceived);
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
+
+            InitializeIcon();
+        }
+
+        private void InitializeIcon()
+        {
+            this.notifyIcon = new NotifyIcon();
+            this.notifyIcon.Icon = new System.Drawing.Icon("network.ico");
+            this.notifyIcon.Visible = true;
+            this.notifyIcon.MouseDoubleClick += new MouseEventHandler(notifyIcon_MouseDoubleClick);
+
+            ContextMenu iconMenu = new ContextMenu();
+            iconMenu.MenuItems.Add(new MenuItem("Start", (sender, e) => {btnStart_Click(this, null);}));
+            iconMenu.MenuItems.Add(new MenuItem("Pause", (sender, e) => { btnPause_Click(this, null); }));
+            iconMenu.MenuItems.Add(new MenuItem("Exit", (sender, e) => { Close(); }));
+            this.notifyIcon.ContextMenu = iconMenu;
+        }
+
+        void notifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Show();
+            WindowState = WindowState.Normal;
         }
 		
 		private void monitor_PacketReceived(object sender, Packet p)
@@ -39,13 +68,11 @@ namespace NetworkMonitorApplication
             if (isActivated)
             {
                 DispatcherOperation disOp =
-                    dataGridPackets.Dispatcher.BeginInvoke(
-                        DispatcherPriority.Normal, new Action(() =>
-                            {
-                                dataGridPackets.Items.Refresh();
-                            }));
-
-                Thread.Sleep(10);
+                dataGridPackets.Dispatcher.BeginInvoke(
+                    DispatcherPriority.Normal, new Action(() =>
+                    {
+                        dataGridPackets.Items.Refresh();
+                    }));
             }
 		}
 
@@ -82,6 +109,20 @@ namespace NetworkMonitorApplication
         {
             Packet selectedPacket = this.monitor.Packets[this.dataGridPackets.SelectedIndex];
             panelPacketInformation.DataContext = selectedPacket;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            this.notifyIcon.Dispose();
+            this.notifyIcon = null;
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if(WindowState == WindowState.Minimized)
+            {
+                Hide();
+            }
         }
     }
 }
