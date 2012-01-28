@@ -33,6 +33,7 @@ namespace NetworkMonitor
             totalPackets = 0;
             totalDownloaded = 0;
             totalUploaded = 0;
+            this.PacketsToDisplay = new List<Packet>();
         }
 
         protected void NotifyPropertyChanged(string property)
@@ -52,41 +53,48 @@ namespace NetworkMonitor
 
             protocolList.Listen((from a in adaptersToListen select a.AdapterID).ToArray());
 
-            while (true)
-            {
-                NdisHookStubs.NEXT_PACKET nextPacket = NdisHookStubs.NEXT_PACKET.WaitFor();
-                if (nextPacket != null)
+            Thread t = new Thread(() =>
                 {
-                    Packet p = new Packet(nextPacket._data, nextPacket._bDirection);
-                    PacketReceived(this, p);
-                    packets.Add(p);
-                    NotifyPropertyChanged("Packets");
-
-                    totalPackets ++;
-                    NotifyPropertyChanged("TotalPackets");
-
-                    if(p.PacketDirection == PacketDirection.Downloading)
+                    while (true)
                     {
-                        totalDownloaded += p.Size;
-                        NotifyPropertyChanged("TotalDownloaded");
-                    }
-                    else if(p.PacketDirection == PacketDirection.Uploading)
-                    {
-                        totalUploaded += p.Size;
-                        NotifyPropertyChanged("TotalUploaded");
-                    }
+                        NdisHookStubs.NEXT_PACKET nextPacket = NdisHookStubs.NEXT_PACKET.WaitFor();
+                        if (nextPacket != null)
+                        {
+                            Packet p = new Packet(nextPacket._data, nextPacket._bDirection);
+                            PacketReceived(this, p);
+                            packets.Add(p);
+                            NotifyPropertyChanged("Packets");
 
-                    if (this.packets.Count >= PACKET_BUFFER * 2)
-                    {
-                        SerializePackets(PACKET_BUFFER);
+                            totalPackets++;
+                            NotifyPropertyChanged("TotalPackets");
+
+                            if (p.PacketDirection == PacketDirection.Downloading)
+                            {
+                                totalDownloaded += p.Size;
+                                NotifyPropertyChanged("TotalDownloaded");
+                            }
+                            else if (p.PacketDirection == PacketDirection.Uploading)
+                            {
+                                totalUploaded += p.Size;
+                                NotifyPropertyChanged("TotalUploaded");
+                            }
+
+                            //if (this.packets.Count >= PACKET_BUFFER * 2)
+                            //{
+                            //    SerializePackets(PACKET_BUFFER);
+                            //}
+                        }
                     }
-                }
-            }
+                });
+
+            t.IsBackground = true;
+            t.Start();
         }
 
         public void PauseListening()
         {
             protocolList.Stop();
+            this.SerializePackets(this.Packets.Count);
         }
 
         public List<Adapter> GetAdapters()
@@ -132,7 +140,7 @@ namespace NetworkMonitor
                     BinaryFormatter binFormatter = new BinaryFormatter();
                     List<Packet> packetsToSerialize = this.packets.Take(packetCount).ToList();
                     binFormatter.Serialize(stream, packetsToSerialize);
-                    this.packets.RemoveRange(0, packetCount);
+                    //this.packets.RemoveRange(0, packetCount);
                 }
             }
             catch (Exception ex)
@@ -145,6 +153,8 @@ namespace NetworkMonitor
 		{
 			get {return this.packets; }
 		}
+
+        public List<Packet> PacketsToDisplay { get; private set; }
 
         public ulong TotalPackets
         {
