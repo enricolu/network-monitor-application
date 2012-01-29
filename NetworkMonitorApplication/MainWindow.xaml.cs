@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using NetworkMonitor;
 using ContextMenu = System.Windows.Forms.ContextMenu;
+using Image = System.Drawing.Image;
 using MenuItem = System.Windows.Forms.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
@@ -46,15 +47,19 @@ namespace NetworkMonitorApplication
         private void InitializeIcon()
         {
             this.notifyIcon = new NotifyIcon();
-            this.notifyIcon.Icon = new System.Drawing.Icon("network.ico");
+            this.notifyIcon.Icon = new System.Drawing.Icon("Images/network.ico");
             this.notifyIcon.Visible = true;
             this.notifyIcon.MouseDoubleClick += new MouseEventHandler(notifyIcon_MouseDoubleClick);
 
-            ContextMenu iconMenu = new ContextMenu();
-            iconMenu.MenuItems.Add(new MenuItem("Start", (sender, e) => {btnStart_Click(this, null);}));
-            iconMenu.MenuItems.Add(new MenuItem("Pause", (sender, e) => { btnPause_Click(this, null); }));
-            iconMenu.MenuItems.Add(new MenuItem("Exit", (sender, e) => { Close(); }));
-            this.notifyIcon.ContextMenu = iconMenu;
+            ContextMenuStrip iconMenu = new ContextMenuStrip();
+            iconMenu.Items.Add(new ToolStripMenuItem("Start", new Bitmap("Images/Play.png"),
+                                                     (sender, e) => { btnStart_Click(this, null); }));
+            iconMenu.Items.Add(new ToolStripMenuItem("Pause", new Bitmap("Images/Pause.png"), 
+                                                     (sender, e) => { btnPause_Click(this, null); }));
+            iconMenu.Items.Add(new ToolStripMenuItem("Exit", new Bitmap("Images/Exit.png"), 
+                                                     (sender, e) => { Close(); }));
+
+            this.notifyIcon.ContextMenuStrip = iconMenu;
         }
 
         void notifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -67,9 +72,8 @@ namespace NetworkMonitorApplication
 		{
             if (isActivated)
             {
-                DispatcherOperation disOp =
                 dataGridPackets.Dispatcher.BeginInvoke(
-                    DispatcherPriority.Normal, new Action(() =>
+                    DispatcherPriority.Background, new Action(() =>
                     {
                         dataGridPackets.Items.Refresh();
                     }));
@@ -98,6 +102,8 @@ namespace NetworkMonitorApplication
             {
                 isActivated = true;
             }
+
+            dataGridPackets.Items.Refresh();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
@@ -123,6 +129,19 @@ namespace NetworkMonitorApplication
             {
                 Hide();
             }
+        }
+
+        private void btnExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void btnFilter_Click(object sender, RoutedEventArgs e)
+        {
+            this.monitor.Filter.Protocol = IpProtocol.TCP;
+
+            this.monitor.FilterPackets();
+            this.dataGridPackets.Items.Refresh();
         }
     }
 }

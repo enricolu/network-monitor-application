@@ -33,7 +33,7 @@ namespace NetworkMonitor
             totalPackets = 0;
             totalDownloaded = 0;
             totalUploaded = 0;
-            this.PacketsToDisplay = new List<Packet>();
+            this.Filter = new PacketFilter();
         }
 
         protected void NotifyPropertyChanged(string property)
@@ -53,8 +53,8 @@ namespace NetworkMonitor
 
             protocolList.Listen((from a in adaptersToListen select a.AdapterID).ToArray());
 
-            Thread t = new Thread(() =>
-                {
+            //Thread t = new Thread(() =>
+            //    {
                     while (true)
                     {
                         NdisHookStubs.NEXT_PACKET nextPacket = NdisHookStubs.NEXT_PACKET.WaitFor();
@@ -85,10 +85,10 @@ namespace NetworkMonitor
                             //}
                         }
                     }
-                });
+                //});
 
-            t.IsBackground = true;
-            t.Start();
+            //t.IsBackground = true;
+            //t.Start();
         }
 
         public void PauseListening()
@@ -148,13 +148,53 @@ namespace NetworkMonitor
                 throw new SerializationException("Cannon serialize data", ex);
             }
         }
+
+        public bool PacketMatchesFilter(Packet p)
+        {
+            if(this.Filter.Direction != null 
+                && this.Filter.Direction != p.PacketDirection)
+            {
+                return false;
+            }
+
+            if(this.Filter.Host != null
+                && !p.HostName.Contains(this.Filter.Host))
+            {
+                return false;
+            }
+
+            if(this.Filter.Protocol != null
+                && this.Filter.Protocol != p.IpHeader.Protocol)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void FilterPackets()
+        {
+            //List<Packet> packetsToRemove = new List<Packet>();
+            //foreach (var packet in this.Packets)
+            //{
+            //    if(!PacketMatchesFilter(packet))
+            //    {
+            //        packetsToRemove.Add(packet);
+            //    }
+            //}
+
+            //foreach (var packet in packetsToRemove)
+            //{
+            //    this.Packets.Remove(packet);
+            //}
+
+            this.Packets.RemoveAll(packet => !this.PacketMatchesFilter(packet));
+        }
 		
 		public List<Packet> Packets
 		{
 			get {return this.packets; }
 		}
-
-        public List<Packet> PacketsToDisplay { get; private set; }
 
         public ulong TotalPackets
         {
@@ -170,5 +210,7 @@ namespace NetworkMonitor
         {
             get { return this.totalUploaded; }
         }
+
+        public PacketFilter Filter { get; private set; }
     }
 }
