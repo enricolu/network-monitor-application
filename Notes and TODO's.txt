@@ -1,0 +1,6 @@
+TODO:
+	-create UI (panel or new window) for filtering packets
+	-create UI for showing traffic statistics
+
+Notes:
+	-packets could be stored in a database

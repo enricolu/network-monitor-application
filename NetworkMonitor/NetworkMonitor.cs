@@ -18,10 +18,11 @@ namespace NetworkMonitor
         private NdisHookStubs.NT_PROTOCOL_LIST protocolList;
         private List<Adapter> adapters;
 		private List<Packet> packets = new List<Packet>();
-        private const int PACKET_BUFFER = 50;
+        private const int PACKET_BUFFER = 25;
         private ulong totalPackets;
         private decimal totalDownloaded;
-        private decimal totalUploaded;
+        private decimal totalUploaded; 
+        private BackgroundWorker worker = new BackgroundWorker();
 
         public event PacketReceivedEventHandler PacketReceived;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -46,55 +47,84 @@ namespace NetworkMonitor
 
         public void StartListening(List<Adapter> adaptersToListen = null)
         {
-            if(adaptersToListen == null)
+            if (adaptersToListen == null)
             {
                 adaptersToListen = this.adapters;
             }
 
             protocolList.Listen((from a in adaptersToListen select a.AdapterID).ToArray());
 
-            //Thread t = new Thread(() =>
-            //    {
-                    while (true)
+            while (true)
+            {
+                NdisHookStubs.NEXT_PACKET nextPacket =
+                    NdisHookStubs.NEXT_PACKET.WaitFor();
+
+                if (nextPacket != null)
+                {
+                    worker.DoWork += new DoWorkEventHandler((sender, e) =>
                     {
-                        NdisHookStubs.NEXT_PACKET nextPacket = NdisHookStubs.NEXT_PACKET.WaitFor();
-                        if (nextPacket != null)
+                        Packet p = new Packet(nextPacket._data,
+                                                nextPacket._bDirection);
+
+                        packets.Add(p);
+                        NotifyPropertyChanged("Packets");
+
+                        totalPackets++;
+                        NotifyPropertyChanged("TotalPackets");
+
+                        if (p.PacketDirection == PacketDirection.Downloading)
                         {
-                            Packet p = new Packet(nextPacket._data, nextPacket._bDirection);
-                            PacketReceived(this, p);
-                            packets.Add(p);
-                            NotifyPropertyChanged("Packets");
-
-                            totalPackets++;
-                            NotifyPropertyChanged("TotalPackets");
-
-                            if (p.PacketDirection == PacketDirection.Downloading)
-                            {
-                                totalDownloaded += p.Size;
-                                NotifyPropertyChanged("TotalDownloaded");
-                            }
-                            else if (p.PacketDirection == PacketDirection.Uploading)
-                            {
-                                totalUploaded += p.Size;
-                                NotifyPropertyChanged("TotalUploaded");
-                            }
-
-                            //if (this.packets.Count >= PACKET_BUFFER * 2)
-                            //{
-                            //    SerializePackets(PACKET_BUFFER);
-                            //}
+                            totalDownloaded += p.Size;
+                            NotifyPropertyChanged("TotalDownloaded");
                         }
-                    }
-                //});
+                        else if (p.PacketDirection ==
+                                    PacketDirection.Uploading)
+                        {
+                            totalUploaded += p.Size;
+                            NotifyPropertyChanged("TotalUploaded");
+                        }
 
-            //t.IsBackground = true;
-            //t.Start();
+                        if (this.packets.Count >= PACKET_BUFFER*2)
+                        {
+                            SerializePackets(PACKET_BUFFER);
+                        }
+                        Thread.Sleep(1);
+                    });
+
+
+
+                    worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) =>
+                    {
+                        PacketReceived(this, null);
+                        if (this.packets.Count >=
+                            PACKET_BUFFER*2)
+                        {
+                            SerializePackets(
+                                PACKET_BUFFER);
+                        }
+
+                        worker.
+                            WorkerSupportsCancellation
+                            = true;
+                        worker.CancelAsync();
+                        worker.Dispose();
+                    });
+
+                    if (!worker.IsBusy)
+                    {
+                        worker.RunWorkerAsync();
+                    }
+                }
+            }
         }
 
         public void PauseListening()
         {
+            worker.WorkerSupportsCancellation = true;
+            worker.CancelAsync();
+            worker.Dispose();
             protocolList.Stop();
-            this.SerializePackets(this.Packets.Count);
+            //this.SerializePackets(this.Packets.Count);
         }
 
         public List<Adapter> GetAdapters()
@@ -140,7 +170,7 @@ namespace NetworkMonitor
                     BinaryFormatter binFormatter = new BinaryFormatter();
                     List<Packet> packetsToSerialize = this.packets.Take(packetCount).ToList();
                     binFormatter.Serialize(stream, packetsToSerialize);
-                    //this.packets.RemoveRange(0, packetCount);
+                    this.packets.RemoveRange(0, packetCount);
                 }
             }
             catch (Exception ex)
@@ -174,20 +204,6 @@ namespace NetworkMonitor
 
         public void FilterPackets()
         {
-            //List<Packet> packetsToRemove = new List<Packet>();
-            //foreach (var packet in this.Packets)
-            //{
-            //    if(!PacketMatchesFilter(packet))
-            //    {
-            //        packetsToRemove.Add(packet);
-            //    }
-            //}
-
-            //foreach (var packet in packetsToRemove)
-            //{
-            //    this.Packets.Remove(packet);
-            //}
-
             this.Packets.RemoveAll(packet => !this.PacketMatchesFilter(packet));
         }
 		
