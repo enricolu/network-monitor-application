@@ -70,14 +70,14 @@ namespace NetworkMonitorApplication
 		
 		private void monitor_PacketReceived(object sender, Packet p)
 		{
-            if (isActivated)
-            {
+            //if (isActivated)
+            //{
                 dataGridPackets.Dispatcher.BeginInvoke(
                     DispatcherPriority.Background, new Action(() =>
                     {
                         dataGridPackets.Items.Refresh();
                     }));
-            }
+            //}
 		}
 
         private void btnStart_Click(object sender, RoutedEventArgs e)

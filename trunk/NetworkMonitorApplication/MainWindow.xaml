@@ -38,7 +38,7 @@
                     <StackPanel Orientation="Vertical">
                         <DataGrid x:Name="dataGridPackets" AutoGenerateColumns="False"
                             IsReadOnly="True" MouseDown="dataGridPackets_MouseDown" VerticalScrollBarVisibility="Visible"
-                            MaxHeight="{Binding ElementName=mainContainer}" VirtualizingStackPanel.IsVirtualizing="True">
+                            MaxHeight="600" VirtualizingStackPanel.IsVirtualizing="True">
 
                             <!--The Columns-->
                             <DataGrid.Columns>
