@@ -84,7 +84,7 @@ namespace NetworkMonitor
                             NotifyPropertyChanged("TotalUploaded");
                         }
 
-                        if (this.packets.Count >= PACKET_BUFFER*2)
+                        if (this.packets.Count >= PACKET_BUFFER * 2)
                         {
                             SerializePackets(PACKET_BUFFER);
                         }
@@ -96,12 +96,12 @@ namespace NetworkMonitor
                     worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) =>
                     {
                         PacketReceived(this, null);
-                        if (this.packets.Count >=
-                            PACKET_BUFFER*2)
-                        {
-                            SerializePackets(
-                                PACKET_BUFFER);
-                        }
+                        //if (this.packets.Count >=
+                        //    PACKET_BUFFER*2)
+                        //{
+                        //    SerializePackets(
+                        //        PACKET_BUFFER);
+                        //}
 
                         worker.
                             WorkerSupportsCancellation

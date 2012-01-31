@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" 
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        Title="Network Monitor" Width="700" Height="450" Activated="Window_Activated" 
+        Title="Network Monitor" Width="Auto" Height="Auto" Activated="Window_Activated" 
+        SizeToContent="WidthAndHeight"
         Deactivated="Window_Deactivated" Closed="Window_Closed"
         Icon="Images/network.ico" StateChanged="Window_StateChanged">
     <Window.Resources>
@@ -34,8 +35,8 @@
         </ToolBar>
     	<TabControl Margin="0,48,0,25">
     		<TabItem x:Name="tabItemPackets" Header="Packets">
-    			<WrapPanel Background="#FFE5E5E5" Orientation="Horizontal" x:Name="mainContainer">
-                    <StackPanel Orientation="Vertical">
+    			<DockPanel Background="#FFE5E5E5" x:Name="mainContainer">
+                    <GroupBox Header="Packets">
                         <DataGrid x:Name="dataGridPackets" AutoGenerateColumns="False"
                             IsReadOnly="True" MouseDown="dataGridPackets_MouseDown" VerticalScrollBarVisibility="Visible"
                             MaxHeight="600" VirtualizingStackPanel.IsVirtualizing="True">
@@ -59,48 +60,69 @@
                             </DataGrid.Columns>
 					
 					    </DataGrid>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Vertical" x:Name="panelPacketInformation"
-                        Margin="20, 0, 0, 0">
-                        <Label>Packet Information:</Label>
-                        <WrapPanel>
-                            <Label>Source IP:</Label>
-                            <Label Content="{Binding IpHeader.SourceIpAddress}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Destination IP:</Label>
-                            <Label Content="{Binding IpHeader.DestinationIpAddress}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Source MAC:</Label>
-                            <Label Content="{Binding EthernetHeader.SourceMacAddress}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Destination MAC:</Label>
-                            <Label Content="{Binding EthernetHeader.DestinationMacAddress}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Remote Host:</Label>
-                            <Label Content="{Binding HostName}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Size:</Label>
-                            <Label Content="{Binding Size}" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label>Protocol:</Label>
-                            <Label Content="{Binding IpHeader.Protocol}" />
-                        </WrapPanel>
-                        <WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Packet Information" DockPanel.Dock="Top" Margin="20"
+                        x:Name="panelPacketInformation">
+                        
+                        <StackPanel Orientation="Vertical">
+                            <WrapPanel>
+                                <Label>Source IP:</Label>
+                                <Label Content="{Binding IpHeader.SourceIpAddress}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Destination IP:</Label>
+                                <Label Content="{Binding IpHeader.DestinationIpAddress}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Source MAC:</Label>
+                                <Label Content="{Binding EthernetHeader.SourceMacAddress}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Destination MAC:</Label>
+                                <Label Content="{Binding EthernetHeader.DestinationMacAddress}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Remote Host:</Label>
+                                <Label Content="{Binding HostName}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Size:</Label>
+                                <Label Content="{Binding Size}" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label>Protocol:</Label>
+                                <Label Content="{Binding IpHeader.Protocol}" />
+                            </WrapPanel>
+                            <WrapPanel>
                             <Label>Direction:</Label>
                             <Label Content="{Binding PacketDirection}" />
                         </WrapPanel>
+                        </StackPanel>
+
+                    </GroupBox>
+
+                    <GroupBox Header="Filter Packets" DockPanel.Dock="Bottom" Margin="20">
+                    <StackPanel Orientation="Vertical">
+                        <WrapPanel>
+                            <Label>Protocol:</Label>
+                            <ComboBox x:Name="comboProtocols" ItemsSource="{Binding Source={StaticResource protocolEnum}}"
+                                SelectedIndex="0"/>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Label>Direction:</Label>
+                            <ComboBox x:Name="comboDirection" ItemsSource="{Binding Source={StaticResource directionEnum}}"
+                                SelectedIndex="0"/>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Label>Host:</Label>
+                            <TextBox x:Name="txtHost" Width="150px" />
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Button x:Name="btnFilter" Click="btnFilter_Click" Width="120px">Filter Packets</Button>
+                        </WrapPanel>
                     </StackPanel>
-                        <Button x:Name="btnFilter" Click="btnFilter_Click">Filter Packets</Button>
-                    </StackPanel>
-    			</WrapPanel>
+                    </GroupBox>
+                </DockPanel>
     		</TabItem>
     		<TabItem x:Name="tabItemStatistics" Header="Statistics">
     			<Grid Background="#FFE5E5E5"/>
