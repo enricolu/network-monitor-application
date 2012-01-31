@@ -138,10 +138,14 @@ namespace NetworkMonitorApplication
 
         private void btnFilter_Click(object sender, RoutedEventArgs e)
         {
-            this.monitor.Filter.Protocol = IpProtocol.TCP;
+            this.monitor.Filter.Protocol = (IpProtocol)comboProtocols.SelectedValue;
+            this.monitor.Filter.Direction = (PacketDirection) comboDirection.SelectedValue;
+            if(!string.IsNullOrEmpty(this.txtHost.Text))
+            {
+                this.monitor.Filter.Host = this.txtHost.Text;
+            }
 
             this.monitor.FilterPackets();
-            this.dataGridPackets.Items.Refresh();
         }
     }
 }
