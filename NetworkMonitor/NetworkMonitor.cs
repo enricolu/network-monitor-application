@@ -11,8 +11,6 @@ using NdisMonitor;
 
 namespace NetworkMonitor
 {
-    public delegate void PacketReceivedEventHandler(object sender, Packet packet);
-
     public class NetworkMonitor : INotifyPropertyChanged
     {
         private NdisHookStubs.NT_PROTOCOL_LIST protocolList;
@@ -22,9 +20,7 @@ namespace NetworkMonitor
         private ulong totalPackets;
         private decimal totalDownloaded;
         private decimal totalUploaded; 
-        private BackgroundWorker worker = new BackgroundWorker();
 
-        public event PacketReceivedEventHandler PacketReceived;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public NetworkMonitor()
@@ -61,58 +57,30 @@ namespace NetworkMonitor
 
                 if (nextPacket != null)
                 {
-                    worker.DoWork += new DoWorkEventHandler((sender, e) =>
+                    Packet p = new Packet(nextPacket._data,
+                                            nextPacket._bDirection);
+
+                    packets.Add(p);
+                    NotifyPropertyChanged("Packets");
+
+                    totalPackets++;
+                    NotifyPropertyChanged("TotalPackets");
+
+                    if (p.PacketDirection == PacketDirection.Downloading)
                     {
-                        Packet p = new Packet(nextPacket._data,
-                                                nextPacket._bDirection);
-
-                        packets.Add(p);
-                        NotifyPropertyChanged("Packets");
-
-                        totalPackets++;
-                        NotifyPropertyChanged("TotalPackets");
-
-                        if (p.PacketDirection == PacketDirection.Downloading)
-                        {
-                            totalDownloaded += p.Size;
-                            NotifyPropertyChanged("TotalDownloaded");
-                        }
-                        else if (p.PacketDirection ==
-                                    PacketDirection.Uploading)
-                        {
-                            totalUploaded += p.Size;
-                            NotifyPropertyChanged("TotalUploaded");
-                        }
-
-                        if (this.packets.Count >= PACKET_BUFFER * 2)
-                        {
-                            SerializePackets(PACKET_BUFFER);
-                        }
-                        Thread.Sleep(1);
-                    });
-
-
-
-                    worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((sender, e) =>
+                        totalDownloaded += p.Size;
+                        NotifyPropertyChanged("TotalDownloaded");
+                    }
+                    else if (p.PacketDirection ==
+                                PacketDirection.Uploading)
                     {
-                        PacketReceived(this, null);
-                        //if (this.packets.Count >=
-                        //    PACKET_BUFFER*2)
-                        //{
-                        //    SerializePackets(
-                        //        PACKET_BUFFER);
-                        //}
+                        totalUploaded += p.Size;
+                        NotifyPropertyChanged("TotalUploaded");
+                    }
 
-                        worker.
-                            WorkerSupportsCancellation
-                            = true;
-                        worker.CancelAsync();
-                        worker.Dispose();
-                    });
-
-                    if (!worker.IsBusy)
+                    if (this.packets.Count >= PACKET_BUFFER * 2)
                     {
-                        worker.RunWorkerAsync();
+                        SerializePackets(PACKET_BUFFER);
                     }
                 }
             }
@@ -120,9 +88,6 @@ namespace NetworkMonitor
 
         public void PauseListening()
         {
-            worker.WorkerSupportsCancellation = true;
-            worker.CancelAsync();
-            worker.Dispose();
             protocolList.Stop();
             //this.SerializePackets(this.Packets.Count);
         }

@@ -12,7 +12,6 @@ namespace NetworkMonitorTest
         static void Main(string[] args)
         {
             NetworkMonitor.NetworkMonitor monitor = new NetworkMonitor.NetworkMonitor();
-            monitor.PacketReceived += new PacketReceivedEventHandler(monitor_PacketReceived);
             monitor.StartListening();
         }
 

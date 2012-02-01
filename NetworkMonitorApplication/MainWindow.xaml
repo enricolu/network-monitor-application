@@ -3,9 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" 
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        Title="Network Monitor" Width="Auto" Height="Auto" Activated="Window_Activated" 
-        SizeToContent="WidthAndHeight"
-        Deactivated="Window_Deactivated" Closed="Window_Closed"
+        Title="Network Monitor" Width="800" Height="600" Closed="Window_Closed"
         Icon="Images/network.ico" StateChanged="Window_StateChanged">
     <Window.Resources>
         <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"
