@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.IO;
 
 namespace NetworkMonitor
 {
@@ -33,6 +35,19 @@ namespace NetworkMonitor
             }
 
             ArrivalTime = DateTime.Now;
+        }
+
+        public static void Serialize(Packet p, string fileName)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            binaryFormatter.Serialize(memoryStream, p);
+            string base64Str = System.Convert.ToBase64String(memoryStream.ToArray());
+
+            using(StreamWriter writer = new StreamWriter(fileName, true))
+            {
+                writer.WriteLine(base64Str);
+            }
         }
 
         public EthernetHeader EthernetHeader
