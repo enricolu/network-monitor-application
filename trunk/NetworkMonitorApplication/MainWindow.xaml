@@ -64,37 +64,37 @@
                         
                         <StackPanel Orientation="Vertical">
                             <WrapPanel>
-                                <Label>Source IP:</Label>
+                                <Label FontWeight="Bold">Source IP:</Label>
                                 <Label Content="{Binding IpHeader.SourceIpAddress}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Destination IP:</Label>
+                                <Label FontWeight="Bold">Destination IP:</Label>
                                 <Label Content="{Binding IpHeader.DestinationIpAddress}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Source MAC:</Label>
+                                <Label FontWeight="Bold">Source MAC:</Label>
                                 <Label Content="{Binding EthernetHeader.SourceMacAddress}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Destination MAC:</Label>
+                                <Label FontWeight="Bold">Destination MAC:</Label>
                                 <Label Content="{Binding EthernetHeader.DestinationMacAddress}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Remote Host:</Label>
+                                <Label FontWeight="Bold">Remote Host:</Label>
                                 <Label Content="{Binding HostName}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Size:</Label>
+                                <Label FontWeight="Bold">Size:</Label>
                                 <Label Content="{Binding Size}" />
                             </WrapPanel>
                             <WrapPanel>
-                                <Label>Protocol:</Label>
+                                <Label FontWeight="Bold">Protocol:</Label>
                                 <Label Content="{Binding IpHeader.Protocol}" />
                             </WrapPanel>
                             <WrapPanel>
-                            <Label>Direction:</Label>
-                            <Label Content="{Binding PacketDirection}" />
-                        </WrapPanel>
+                                <Label FontWeight="Bold">Direction:</Label>
+                                <Label Content="{Binding PacketDirection}" />
+                            </WrapPanel>
                         </StackPanel>
 
                     </GroupBox>
@@ -102,17 +102,17 @@
                     <GroupBox Header="Filter Packets" DockPanel.Dock="Bottom" Margin="20">
                     <StackPanel Orientation="Vertical">
                         <WrapPanel>
-                            <Label>Protocol:</Label>
+                            <Label FontWeight="Bold">Protocol:</Label>
                             <ComboBox x:Name="comboProtocols" ItemsSource="{Binding Source={StaticResource protocolEnum}}"
                                 SelectedIndex="0"/>
                         </WrapPanel>
                         <WrapPanel>
-                            <Label>Direction:</Label>
+                            <Label FontWeight="Bold">Direction:</Label>
                             <ComboBox x:Name="comboDirection" ItemsSource="{Binding Source={StaticResource directionEnum}}"
                                 SelectedIndex="0"/>
                         </WrapPanel>
                         <WrapPanel>
-                            <Label>Host:</Label>
+                            <Label FontWeight="Bold">Host:</Label>
                             <TextBox x:Name="txtHost" Width="150px" />
                         </WrapPanel>
                         <WrapPanel>

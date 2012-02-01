@@ -90,7 +90,7 @@ namespace NetworkMonitor
         public void PauseListening()
         {
             protocolList.Stop();
-            //this.SerializePackets(this.Packets.Count);
+            this.SerializePackets(this.Packets.Count, false);
         }
 
         public List<Adapter> GetAdapters()
@@ -127,7 +127,7 @@ namespace NetworkMonitor
             }
         }
 
-        private void SerializePackets(int packetCount)
+        private void SerializePackets(int packetCount, bool delete = true)
         {
             try
             {
@@ -136,7 +136,10 @@ namespace NetworkMonitor
                     Packet.Serialize(Packets[i], PACKET_DATABASE);
                 }
 
-                this.packets.RemoveRange(0, packetCount);
+                if (delete)
+                {
+                    this.packets.RemoveRange(0, packetCount);
+                }
             }
             catch (Exception ex)
             {
@@ -186,12 +189,21 @@ namespace NetworkMonitor
 
         public void FilterPackets()
         {
-            this.Packets.RemoveAll(packet => !this.PacketMatchesFilter(packet));
+            List<Packet> allPackets = this.DeserializeAllPackets();
+            List<Packet> filtered = (from p in allPackets
+                                     where PacketMatchesFilter(p)
+                                     select p).ToList();
+            this.Packets = filtered;
         }
 		
 		public List<Packet> Packets
 		{
 			get {return this.packets; }
+            private set 
+            { 
+                this.packets = value;
+                NotifyPropertyChanged("Packets");
+            }
 		}
 
         public ulong TotalPackets

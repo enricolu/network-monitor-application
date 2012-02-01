@@ -131,6 +131,7 @@ namespace NetworkMonitorApplication
             }
 
             this.monitor.FilterPackets();
+            this.dataGridPackets.ItemsSource = this.monitor.Packets;
         }
     }
 }
