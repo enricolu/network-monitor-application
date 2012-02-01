@@ -17,6 +17,7 @@ namespace NetworkMonitor
         private List<Adapter> adapters;
 		private List<Packet> packets = new List<Packet>();
         private const int PACKET_BUFFER = 25;
+        private const string PACKET_DATABASE = "packets.bin";
         private ulong totalPackets;
         private decimal totalDownloaded;
         private decimal totalUploaded; 
@@ -130,18 +131,34 @@ namespace NetworkMonitor
         {
             try
             {
-                using(Stream stream = File.Open("packets.bin", FileMode.OpenOrCreate))
+                for (int i = 0; i < packetCount; i ++ )
                 {
-                    BinaryFormatter binFormatter = new BinaryFormatter();
-                    List<Packet> packetsToSerialize = this.packets.Take(packetCount).ToList();
-                    binFormatter.Serialize(stream, packetsToSerialize);
-                    this.packets.RemoveRange(0, packetCount);
+                    Packet.Serialize(Packets[i], PACKET_DATABASE);
                 }
+
+                this.packets.RemoveRange(0, packetCount);
             }
             catch (Exception ex)
             {
                 throw new SerializationException("Cannon serialize data", ex);
             }
+        }
+
+        public List<Packet> DeserializeAllPackets()
+        {
+            List<Packet> packets = new List<Packet>();
+            StreamReader streamReader = new StreamReader(PACKET_DATABASE);
+
+            while(!streamReader.EndOfStream)
+            {
+                string base64Str = streamReader.ReadLine();
+                byte[] packetData = Convert.FromBase64String(base64Str);
+                MemoryStream memoryStream = new MemoryStream(packetData);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                packets.Add((Packet)binaryFormatter.Deserialize(memoryStream));
+            }
+
+            return packets;
         }
 
         public bool PacketMatchesFilter(Packet p)

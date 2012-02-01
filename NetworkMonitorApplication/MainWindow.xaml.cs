@@ -92,6 +92,8 @@ namespace NetworkMonitorApplication
             worker.CancelAsync();
             worker.Dispose();
             monitor.PauseListening();
+            int packetCount = monitor.DeserializeAllPackets().Count;
+            MessageBox.Show(packetCount.ToString());
         }
 
         private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
