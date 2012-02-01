@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -30,14 +31,13 @@ namespace NetworkMonitorApplication
     public partial class MainWindow : Window
     {
 		private NetworkMonitor.NetworkMonitor monitor;
-        private bool isActivated = false;
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        private BackgroundWorker worker = new BackgroundWorker();
 		
         public MainWindow()
         {
             InitializeComponent();
 			monitor = new NetworkMonitor.NetworkMonitor();
-			monitor.PacketReceived += new PacketReceivedEventHandler(monitor_PacketReceived);
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
 
@@ -67,48 +67,31 @@ namespace NetworkMonitorApplication
             Show();
             WindowState = WindowState.Normal;
         }
-		
-		private void monitor_PacketReceived(object sender, Packet p)
-		{
-            //if (isActivated)
-            //{
-                dataGridPackets.Dispatcher.BeginInvoke(
-                    DispatcherPriority.Background, new Action(() =>
-                    {
-                        dataGridPackets.Items.Refresh();
-                    }));
-            //}
-		}
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            Thread t = new Thread(() =>
+            worker.DoWork += new DoWorkEventHandler((s, a) =>
             {
                 monitor.StartListening();
             });
-            t.IsBackground = true;
 
-            t.Start();
+            worker.RunWorkerAsync();
+
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(5000);
+            timer.Tick += new EventHandler((s, a) =>
+                {
+                    dataGridPackets.Items.Refresh();
+                });
+            timer.Start();
         }
 
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
+            worker.WorkerSupportsCancellation = true;
+            worker.CancelAsync();
+            worker.Dispose();
             monitor.PauseListening();
-        }
-
-        private void Window_Activated(object sender, EventArgs e)
-        {
-            if(!isActivated)
-            {
-                isActivated = true;
-            }
-
-            dataGridPackets.Items.Refresh();
-        }
-
-        private void Window_Deactivated(object sender, EventArgs e)
-        {
-            isActivated = false;
         }
 
         private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
