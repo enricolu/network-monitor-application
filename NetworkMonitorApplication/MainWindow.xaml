@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" 
         xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
         Title="Network Monitor" Width="800" Height="600" Closed="Window_Closed"
         Icon="Images/network.ico" StateChanged="Window_StateChanged">
     <Window.Resources>
@@ -131,8 +132,18 @@
                 </DockPanel>
     		</TabItem>
     		<TabItem x:Name="tabItemStatistics" Header="Statistics">
-    			<Grid Background="#FFE5E5E5"/>
-    		</TabItem>
+                <StackPanel Background="#FFE5E5E5">
+                    <Button x:Name="btnShowStatistics" Width="120" Height="35" Click="btnShowStatistics_Click">Show Statistics</Button>
+                    <d3:ChartPlotter Margin="20" x:Name="plotter">
+                        <d3:ChartPlotter.HorizontalAxis>
+                            <d3:HorizontalIntegerAxis Name="minutesAxis" />
+                        </d3:ChartPlotter.HorizontalAxis>
+                        <d3:ChartPlotter.VerticalAxis>
+                            <d3:VerticalIntegerAxis Name="trafficAxis" />
+                        </d3:ChartPlotter.VerticalAxis>
+                    </d3:ChartPlotter>
+                </StackPanel>
+            </TabItem>
     	</TabControl>
         <StatusBar x:Name="statusBar" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20, 0">
