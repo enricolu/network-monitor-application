@@ -32,6 +32,7 @@ namespace NetworkMonitor
             totalDownloaded = 0;
             totalUploaded = 0;
             this.Filter = new PacketFilter();
+            this.TrafficStatistics = new TrafficStatistics(this.packets);
         }
 
         protected void NotifyPropertyChanged(string property)
@@ -222,5 +223,6 @@ namespace NetworkMonitor
         }
 
         public PacketFilter Filter { get; private set; }
+        public TrafficStatistics TrafficStatistics { get; private set; }
     }
 }

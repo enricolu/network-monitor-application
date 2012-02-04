@@ -14,3 +14,6 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NmExtension.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\DynamicDataDisplay.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\DynamicDataDisplay.xml
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\ru-ru\DynamicDataDisplay.resources.dll

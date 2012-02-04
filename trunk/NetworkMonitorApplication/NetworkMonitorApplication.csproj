@@ -38,6 +38,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DynamicDataDisplay">
+      <HintPath>C:\Documents and Settings\User\My Documents\DynamicDataDisplay v0.3 Binaries &amp; Samples\DynamicDataDisplay\DynamicDataDisplay.dll</HintPath>
+    </Reference>
     <Reference Include="NetworkMonitor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\NetworkMonitor\bin\Debug\NetworkMonitor.dll</HintPath>
     </Reference>

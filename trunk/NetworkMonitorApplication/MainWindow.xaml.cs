@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,12 +15,17 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.Research.DynamicDataDisplay.Charts;
+using Microsoft.Research.DynamicDataDisplay.Common;
 using NetworkMonitor;
 using ContextMenu = System.Windows.Forms.ContextMenu;
 using Image = System.Drawing.Image;
 using MenuItem = System.Windows.Forms.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
+using Microsoft.Research.DynamicDataDisplay;
+using Microsoft.Research.DynamicDataDisplay.DataSources;
+using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 
 namespace NetworkMonitorApplication
 {
@@ -52,11 +56,11 @@ namespace NetworkMonitorApplication
             this.notifyIcon.MouseDoubleClick += new MouseEventHandler(notifyIcon_MouseDoubleClick);
 
             ContextMenuStrip iconMenu = new ContextMenuStrip();
-            iconMenu.Items.Add(new ToolStripMenuItem("Start", new Bitmap("Images/Play.png"),
+            iconMenu.Items.Add(new ToolStripMenuItem("Start", new System.Drawing.Bitmap("Images/Play.png"),
                                                      (sender, e) => { btnStart_Click(this, null); }));
-            iconMenu.Items.Add(new ToolStripMenuItem("Pause", new Bitmap("Images/Pause.png"), 
+            iconMenu.Items.Add(new ToolStripMenuItem("Pause", new System.Drawing.Bitmap("Images/Pause.png"), 
                                                      (sender, e) => { btnPause_Click(this, null); }));
-            iconMenu.Items.Add(new ToolStripMenuItem("Exit", new Bitmap("Images/Exit.png"), 
+            iconMenu.Items.Add(new ToolStripMenuItem("Exit", new System.Drawing.Bitmap("Images/Exit.png"), 
                                                      (sender, e) => { Close(); }));
 
             this.notifyIcon.ContextMenuStrip = iconMenu;
@@ -92,8 +96,6 @@ namespace NetworkMonitorApplication
             worker.CancelAsync();
             worker.Dispose();
             monitor.PauseListening();
-            int packetCount = monitor.DeserializeAllPackets().Count;
-            MessageBox.Show(packetCount.ToString());
         }
 
         private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
@@ -148,6 +150,39 @@ namespace NetworkMonitorApplication
             });
             
             filterWorker.RunWorkerAsync();
+        }
+
+        private void btnShowStatistics_Click(object sender, RoutedEventArgs e)
+        {
+            BackgroundWorker getStatsWorker = new BackgroundWorker();
+            byte[] minutes = null;
+            double[] traffic = null;
+            getStatsWorker.DoWork += new DoWorkEventHandler((a, b) =>
+            {
+                TrafficStatistics statistics = new TrafficStatistics(monitor.DeserializeAllPackets());
+                minutes = statistics.GetDownloadedByMinutes().Keys.ToArray();
+                traffic = statistics.GetDownloadedByMinutes().Values.Select(x => (double)x).ToArray();
+            });
+
+            getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
+            {
+                ObservableDataSource<byte> minutesSource = new ObservableDataSource<byte>(minutes);
+                minutesSource.SetXMapping(x => x);
+                ObservableDataSource<double> trafficSource = new ObservableDataSource<double>(traffic);
+                trafficSource.SetYMapping(y => y);
+
+                plotter.Visible = new DataRect(-1, -1, 62, 10000000);
+
+                CompositeDataSource compositeDataSource = new CompositeDataSource(minutesSource, trafficSource);
+                this.plotter.AddLineGraph(compositeDataSource, new Pen(Brushes.Blue, 2),
+                                          new CirclePointMarker { Size = 1.0, Fill = Brushes.Red },
+                                          new PenDescription("Downloaded"));
+                plotter.Children.RemoveAll<IPlotterElement>(plotter.MouseNavigation.GetType());
+                plotter.Children.RemoveAll<IPlotterElement>(plotter.KeyboardNavigation.GetType());
+                //plotter.Viewport.FitToView();                                                                                                                                     
+            });
+
+            getStatsWorker.RunWorkerAsync();
         }
     }
 }
