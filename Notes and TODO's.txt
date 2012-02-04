@@ -4,3 +4,4 @@ TODO:
 
 Notes:
 	[working...] packets could be stored in a database
+	- better looking progressbar for filtering packets

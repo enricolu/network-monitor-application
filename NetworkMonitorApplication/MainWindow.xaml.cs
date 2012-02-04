@@ -130,8 +130,24 @@ namespace NetworkMonitorApplication
                 this.monitor.Filter.Host = this.txtHost.Text;
             }
 
-            this.monitor.FilterPackets();
-            this.dataGridPackets.ItemsSource = this.monitor.Packets;
+            this.filteringProgress.Visibility = Visibility.Visible;
+            this.filteringProgress.IsIndeterminate = true;
+            BackgroundWorker filterWorker = new BackgroundWorker();
+            filterWorker.DoWork += new DoWorkEventHandler((a, b) =>
+            {
+                this.monitor.FilterPackets();
+                this.filteringProgress.Value++;
+            });
+            
+            filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
+            {
+                this.dataGridPackets.ItemsSource = this.monitor.Packets;
+                this.lblFoundPackets.Content = this.monitor.Packets.Count.ToString();
+                this.filteringProgress.IsIndeterminate = false;
+                this.filteringProgress.Visibility = Visibility.Collapsed;
+            });
+            
+            filterWorker.RunWorkerAsync();
         }
     }
 }

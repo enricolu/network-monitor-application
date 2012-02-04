@@ -100,25 +100,33 @@
                     </GroupBox>
 
                     <GroupBox Header="Filter Packets" DockPanel.Dock="Bottom" Margin="20">
-                    <StackPanel Orientation="Vertical">
-                        <WrapPanel>
-                            <Label FontWeight="Bold">Protocol:</Label>
-                            <ComboBox x:Name="comboProtocols" ItemsSource="{Binding Source={StaticResource protocolEnum}}"
-                                SelectedIndex="0"/>
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label FontWeight="Bold">Direction:</Label>
-                            <ComboBox x:Name="comboDirection" ItemsSource="{Binding Source={StaticResource directionEnum}}"
-                                SelectedIndex="0"/>
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Label FontWeight="Bold">Host:</Label>
-                            <TextBox x:Name="txtHost" Width="150px" />
-                        </WrapPanel>
-                        <WrapPanel>
-                            <Button x:Name="btnFilter" Click="btnFilter_Click" Width="120px">Filter Packets</Button>
-                        </WrapPanel>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <WrapPanel>
+                                <Label FontWeight="Bold">Protocol:</Label>
+                                <ComboBox x:Name="comboProtocols" ItemsSource="{Binding Source={StaticResource protocolEnum}}"
+                                    SelectedIndex="0"/>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label FontWeight="Bold">Direction:</Label>
+                                <ComboBox x:Name="comboDirection" ItemsSource="{Binding Source={StaticResource directionEnum}}"
+                                    SelectedIndex="0"/>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label FontWeight="Bold">Host:</Label>
+                                <TextBox x:Name="txtHost" Width="150px" />
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Button x:Name="btnFilter" Click="btnFilter_Click" Width="120px">Filter Packets</Button>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <ProgressBar x:Name="filteringProgress" IsIndeterminate="True" Visibility="Collapsed" Width="150px"
+                                    Height="25px" Minimum="0" Maximum="100" Margin="0, 10"/>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label FontWeight="Bold">Packets found:</Label>
+                                <Label x:Name="lblFoundPackets" />
+                            </WrapPanel>
+                        </StackPanel>
                     </GroupBox>
                 </DockPanel>
     		</TabItem>
