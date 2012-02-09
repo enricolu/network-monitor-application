@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.DataVisualization.Charting;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -23,9 +26,9 @@ using Image = System.Drawing.Image;
 using MenuItem = System.Windows.Forms.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
-using Microsoft.Research.DynamicDataDisplay;
-using Microsoft.Research.DynamicDataDisplay.DataSources;
-using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+//using Microsoft.Research.DynamicDataDisplay;
+//using Microsoft.Research.DynamicDataDisplay.DataSources;
+//using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 
 namespace NetworkMonitorApplication
 {
@@ -41,10 +44,14 @@ namespace NetworkMonitorApplication
         public MainWindow()
         {
             InitializeComponent();
+            Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline),
+                new FrameworkPropertyMetadata { DefaultValue = 20 });
+
 			monitor = new NetworkMonitor.NetworkMonitor();
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
 
+            this.columnChart.Series.Clear();
             InitializeIcon();
         }
 
@@ -132,21 +139,19 @@ namespace NetworkMonitorApplication
                 this.monitor.Filter.Host = this.txtHost.Text;
             }
 
-            this.filteringProgress.Visibility = Visibility.Visible;
-            this.filteringProgress.IsIndeterminate = true;
+            this.progressBarFiltering.Visibility = Visibility.Visible;
+
             BackgroundWorker filterWorker = new BackgroundWorker();
             filterWorker.DoWork += new DoWorkEventHandler((a, b) =>
             {
                 this.monitor.FilterPackets();
-                this.filteringProgress.Value++;
             });
             
             filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
             {
                 this.dataGridPackets.ItemsSource = this.monitor.Packets;
                 this.lblFoundPackets.Content = this.monitor.Packets.Count.ToString();
-                this.filteringProgress.IsIndeterminate = false;
-                this.filteringProgress.Visibility = Visibility.Collapsed;
+                this.progressBarFiltering.Visibility = Visibility.Collapsed;
             });
             
             filterWorker.RunWorkerAsync();
@@ -154,32 +159,60 @@ namespace NetworkMonitorApplication
 
         private void btnShowStatistics_Click(object sender, RoutedEventArgs e)
         {
+            this.progressBarStatistics.Visibility = System.Windows.Visibility.Visible;
             BackgroundWorker getStatsWorker = new BackgroundWorker();
-            byte[] minutes = null;
-            double[] traffic = null;
+
+            ObservableCollection<KeyValuePair<byte, ulong>> downloaded = new ObservableCollection<KeyValuePair<byte, ulong>>();
+            Series downSeries = new LineSeries()
+            {
+                Title = "Downloaded",
+                DependentValuePath = "Value",
+                IndependentValuePath = "Key",
+                ItemsSource = downloaded,
+                DataPointStyle = (Style)FindResource("downLine")
+            };
+            ObservableCollection<KeyValuePair<byte, ulong>> uploaded = new ObservableCollection<KeyValuePair<byte, ulong>>();
+            Series upSeries = new LineSeries()
+            {
+                Title = "Uploaded",
+                DependentValuePath = "Value",
+                IndependentValuePath = "Key",
+                ItemsSource = uploaded,
+                DataPointStyle = (Style)FindResource("upLine")
+            };   
+
+            this.columnChart.Series.Add(downSeries);
+            this.columnChart.Series.Add(upSeries);                 
+
             getStatsWorker.DoWork += new DoWorkEventHandler((a, b) =>
             {
-                TrafficStatistics statistics = new TrafficStatistics(monitor.DeserializeAllPackets());
-                minutes = statistics.GetDownloadedByMinutes().Keys.ToArray();
-                traffic = statistics.GetDownloadedByMinutes().Values.Select(x => (double)x).ToArray();
+                List<Packet> allPackets = monitor.DeserializeAllPackets();
+                TrafficStatistics statistics = new TrafficStatistics(allPackets);
+
+                var downloadedByMinutes = statistics.GetDownloadedByMinutes();
+                var uploadedByMinutes = statistics.GetUploadedByMinutes();
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    foreach (var key in downloadedByMinutes.Keys)
+                    {
+                        downloaded.Add(new KeyValuePair<byte, ulong>(key, downloadedByMinutes[key]));
+                    }
+
+                    foreach (var key in uploadedByMinutes.Keys)
+                    {
+                        uploaded.Add(new KeyValuePair<byte, ulong>(key, uploadedByMinutes[key]));
+                    }
+                }));
+                
+                
+                allPackets.Clear();
+                allPackets = null;
             });
 
             getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
             {
-                ObservableDataSource<byte> minutesSource = new ObservableDataSource<byte>(minutes);
-                minutesSource.SetXMapping(x => x);
-                ObservableDataSource<double> trafficSource = new ObservableDataSource<double>(traffic);
-                trafficSource.SetYMapping(y => y);
-
-                plotter.Visible = new DataRect(-1, -1, 62, 10000000);
-
-                CompositeDataSource compositeDataSource = new CompositeDataSource(minutesSource, trafficSource);
-                this.plotter.AddLineGraph(compositeDataSource, new Pen(Brushes.Blue, 2),
-                                          new CirclePointMarker { Size = 1.0, Fill = Brushes.Red },
-                                          new PenDescription("Downloaded"));
-                plotter.Children.RemoveAll<IPlotterElement>(plotter.MouseNavigation.GetType());
-                plotter.Children.RemoveAll<IPlotterElement>(plotter.KeyboardNavigation.GetType());
-                //plotter.Viewport.FitToView();                                                                                                                                     
+                this.progressBarStatistics.Visibility =System.Windows.Visibility.Collapsed;
             });
 
             getStatsWorker.RunWorkerAsync();

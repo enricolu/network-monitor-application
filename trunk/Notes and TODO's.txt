@@ -1,7 +1,8 @@
 TODO:
 	[done] create UI (panel or new window) for filtering packets
-	- create UI for showing traffic statistics
+	[working...] create UI for showing traffic statistics
+	- create UI for showing visited sites statistics
 
 Notes:
 	[working...] packets could be stored in a database
-	- better looking progressbar for filtering packets
+	[done] better looking progressbar for filtering packets
