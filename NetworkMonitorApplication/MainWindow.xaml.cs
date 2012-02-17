@@ -26,9 +26,6 @@ using Image = System.Drawing.Image;
 using MenuItem = System.Windows.Forms.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
-//using Microsoft.Research.DynamicDataDisplay;
-//using Microsoft.Research.DynamicDataDisplay.DataSources;
-//using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 
 namespace NetworkMonitorApplication
 {
@@ -51,7 +48,7 @@ namespace NetworkMonitorApplication
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
 
-            this.columnChart.Series.Clear();
+            this.chartTraffic.Series.Clear();
             InitializeIcon();
         }
 
@@ -94,6 +91,7 @@ namespace NetworkMonitorApplication
                 {
                     dataGridPackets.Items.Refresh();
                 });
+
             timer.Start();
         }
 
@@ -162,8 +160,13 @@ namespace NetworkMonitorApplication
             this.progressBarStatistics.Visibility = System.Windows.Visibility.Visible;
             BackgroundWorker getStatsWorker = new BackgroundWorker();
 
-            ObservableCollection<KeyValuePair<byte, ulong>> downloaded = new ObservableCollection<KeyValuePair<byte, ulong>>();
-            Series downSeries = new LineSeries()
+            int timeRange = this.comboTimeRange.SelectedIndex;
+
+            Dictionary<byte, decimal> downloadedStats = new Dictionary<byte, decimal>();
+            Dictionary<byte, decimal> uploadedStats = new Dictionary<byte, decimal>();
+
+            ObservableCollection<KeyValuePair<byte, decimal>> downloaded = new ObservableCollection<KeyValuePair<byte, decimal>>();
+            Series downSeries = new LineSeries
             {
                 Title = "Downloaded",
                 DependentValuePath = "Value",
@@ -171,48 +174,89 @@ namespace NetworkMonitorApplication
                 ItemsSource = downloaded,
                 DataPointStyle = (Style)FindResource("downLine")
             };
-            ObservableCollection<KeyValuePair<byte, ulong>> uploaded = new ObservableCollection<KeyValuePair<byte, ulong>>();
-            Series upSeries = new LineSeries()
+
+            ObservableCollection<KeyValuePair<byte, decimal>> uploaded = new ObservableCollection<KeyValuePair<byte, decimal>>();
+            Series upSeries = new LineSeries
             {
                 Title = "Uploaded",
                 DependentValuePath = "Value",
                 IndependentValuePath = "Key",
                 ItemsSource = uploaded,
                 DataPointStyle = (Style)FindResource("upLine")
-            };   
+            };
 
-            this.columnChart.Series.Add(downSeries);
-            this.columnChart.Series.Add(upSeries);                 
+            if (this.chartTraffic.Series.Count == 0)
+            {
+                this.chartTraffic.Series.Add(downSeries);
+                this.chartTraffic.Series.Add(upSeries);
+            }
 
             getStatsWorker.DoWork += new DoWorkEventHandler((a, b) =>
             {
                 List<Packet> allPackets = monitor.DeserializeAllPackets();
                 TrafficStatistics statistics = new TrafficStatistics(allPackets);
 
-                var downloadedByMinutes = statistics.GetDownloadedByMinutes();
-                var uploadedByMinutes = statistics.GetUploadedByMinutes();
+                switch (timeRange)
+                {
+                    case 0:
+                        downloadedStats = statistics.GetDownloadedLastHour();
+                        uploadedStats = statistics.GetUploadedLastHour();
+                        this.lblTimeValue.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            this.lblTimeValue.Content = "Minutes";
+                        })) ;
+                        break;
+
+                    case 1:
+                        downloadedStats = statistics.GetDownloadedLastDay();
+                        uploadedStats = statistics.GetUploadedLastDay();
+                        this.lblTimeValue.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            this.lblTimeValue.Content = "Hours";
+                        }));
+                        break;
+
+                    case 3:
+                        downloadedStats = statistics.GetDownloadedLastWeek();
+                        uploadedStats = statistics.GetUploadedLastWeek();
+                        this.lblTimeValue.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            this.lblTimeValue.Content = "Days";
+                        }));
+                        break;
+
+                    case 4:
+                        downloadedStats = statistics.GetDownloadedLastMonth();
+                        uploadedStats = statistics.GetUploadedLastMonth();
+                        this.lblTimeValue.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            this.lblTimeValue.Content = "Days";
+                        }));
+                        break;
+                }
 
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    foreach (var key in downloadedByMinutes.Keys)
+                    foreach (var key in downloadedStats.Keys)
                     {
-                        downloaded.Add(new KeyValuePair<byte, ulong>(key, downloadedByMinutes[key]));
+                        downloaded.Add(new KeyValuePair<byte, decimal>(key, downloadedStats[key]));
                     }
 
-                    foreach (var key in uploadedByMinutes.Keys)
+                    foreach (var key in uploadedStats.Keys)
                     {
-                        uploaded.Add(new KeyValuePair<byte, ulong>(key, uploadedByMinutes[key]));
+                        uploaded.Add(new KeyValuePair<byte, decimal>(key, uploadedStats[key]));
                     }
                 }));
-                
-                
+
                 allPackets.Clear();
-                allPackets = null;
+                statistics.Dispose();
             });
 
             getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
             {
+                
                 this.progressBarStatistics.Visibility =System.Windows.Visibility.Collapsed;
+                
             });
 
             getStatsWorker.RunWorkerAsync();
