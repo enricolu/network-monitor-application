@@ -176,19 +176,19 @@
                     Path=TotalPackets}" />
             </StatusBarItem>
             <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20, 0">
-                <TextBlock Text="{Binding StringFormat={}Total Downloaded: {0},
+                <TextBlock Text="{Binding StringFormat={}Total Downloaded: {0}B,
                     Path=TotalDownloaded}" />
             </StatusBarItem>
             <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Total Uploaded: {0},
+                <TextBlock Text="{Binding StringFormat={}Total Uploaded: {0}B,
                     Path=TotalUploaded}" />
             </StatusBarItem>
             <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Down Speed: {0},
+                <TextBlock Text="{Binding StringFormat={}Down Speed: {0} KB/s,
                     Path=DownloadSpeed}" />
             </StatusBarItem>
             <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Up Speed: {0},
+                <TextBlock Text="{Binding StringFormat={}Up Speed: {0} KB/s,
                     Path=UploadSpeed}" />
             </StatusBarItem>
         </StatusBar>
