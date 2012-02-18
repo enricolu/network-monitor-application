@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
+using System.Timers;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using NdisMonitor;
+using Timer = System.Timers.Timer;
 
 namespace NetworkMonitor
 {
@@ -52,8 +53,32 @@ namespace NetworkMonitor
 
             protocolList.Listen((from a in adaptersToListen select a.AdapterID).ToArray());
 
+            double downloaded = 0;
+            double uploaded = 0;
+
+            Timer t = new Timer(1000);
+            t.Elapsed += new ElapsedEventHandler((e, o) =>
+            {
+                if (downloaded != 0)
+                {
+                    this.DownloadSpeed = downloaded / 1000;
+                    NotifyPropertyChanged("DownloadSpeed");
+                    downloaded = 0;
+                }
+
+                if (uploaded != 0)
+                {
+                    this.UploadSpeed = uploaded / 1000;
+                    NotifyPropertyChanged("UploadSpeed");
+                    uploaded = 0;
+                }
+            });
+            t.Start();
+
             while (true)
             {
+                
+
                 NdisHookStubs.NEXT_PACKET nextPacket =
                     NdisHookStubs.NEXT_PACKET.WaitFor();
 
@@ -71,12 +96,14 @@ namespace NetworkMonitor
                     if (p.PacketDirection == PacketDirection.Downloading)
                     {
                         totalDownloaded += p.Size;
+                        downloaded += (ulong)p.Size;
                         NotifyPropertyChanged("TotalDownloaded");
                     }
                     else if (p.PacketDirection ==
                                 PacketDirection.Uploading)
                     {
                         totalUploaded += p.Size;
+                        uploaded += (ulong) p.Size;
                         NotifyPropertyChanged("TotalUploaded");
                     }
 
@@ -221,6 +248,9 @@ namespace NetworkMonitor
         {
             get { return this.totalUploaded; }
         }
+
+        public double DownloadSpeed { get; private set; }
+        public double UploadSpeed { get; set; }
 
         public PacketFilter Filter { get; private set; }
         public TrafficStatistics TrafficStatistics { get; private set; }

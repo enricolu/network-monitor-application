@@ -6,3 +6,4 @@ TODO:
 Notes:
 	[working...] packets could be stored in a database
 	[done] better looking progressbar for filtering packets
+	- mousedown event on datagridpackets randomly thrown an exeption (empy datagrid on load)

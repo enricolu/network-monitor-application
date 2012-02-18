@@ -166,7 +166,7 @@ namespace NetworkMonitor
         private uint ipSource;
         private uint ipDestination;
         private const int ADDRESS_LENGTH = 4;
-        private const string UNKNOWN_HOST = "Unknown";
+        public const string UNKNOWN_HOST = "Unknown";
 
         public IpHeader(RawPacket rawPacket, EthernetHeader macHeader)
         {
