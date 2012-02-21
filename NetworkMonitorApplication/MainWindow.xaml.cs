@@ -254,9 +254,8 @@ namespace NetworkMonitorApplication
 
             getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
             {
-                
                 this.progressBarStatistics.Visibility =System.Windows.Visibility.Collapsed;
-                
+                this.chartTraffic.Visibility = System.Windows.Visibility.Visible;
             });
 
             getStatsWorker.RunWorkerAsync();
