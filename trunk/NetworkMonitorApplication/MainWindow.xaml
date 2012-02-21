@@ -145,13 +145,13 @@
                         </ComboBox>
                     </WrapPanel>
                     <Button x:Name="btnShowStatistics" Width="120" Height="35" Click="btnShowStatistics_Click">Show Statistics</Button>
-                    <local:CircularProgressBar x:Name="progressBarStatistics" Visibility="Collapsed">
+                    <local:CircularProgressBar x:Name="progressBarStatistics" Visibility="Collapsed" Margin="10">
                         <local:CircularProgressBar.RenderTransform>
                             <ScaleTransform ScaleX="0.7" ScaleY="0.7" />
                         </local:CircularProgressBar.RenderTransform>
                     </local:CircularProgressBar>
                     <chartingToolkit:Chart x:Name="chartTraffic" Height="400" Margin="20"
-                        Title="Traffic Statistics">
+                        Title="Traffic Statistics" Visibility="Collapsed">
                         <chartingToolkit:LineSeries DependentValuePath="Value"
                             IndependentValuePath="Key" ItemsSource="{Binding}" />
                         <chartingToolkit:Chart.Axes>
