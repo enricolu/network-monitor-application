@@ -13,5 +13,10 @@
             <Setter Property="Background" Value="Red" />
             <Setter Property="Template" Value="{x:Null}" />
         </Style>
+        
+        <Style TargetType="{x:Type StatusBarItem}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
     </Application.Resources>
 </Application>

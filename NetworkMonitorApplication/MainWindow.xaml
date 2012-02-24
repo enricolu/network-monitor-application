@@ -22,7 +22,7 @@
     <Grid>
         <ToolBar HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="48">
             <Button x:Name="btnStart" Click="btnStart_Click">
-                <Image Source="Images/Play.png" />
+                <Image Source="Images/Play.png" x:Name="imgPlay"/>
             </Button>
             <Button x:Name="btnPause" Click="btnPause_Click">
                 <Image Source="Images/Pause.png" />
@@ -162,7 +162,7 @@
                             </chartingToolkit:LinearAxis>
                             <chartingToolkit:LinearAxis Orientation="Y">
                                 <chartingToolkit:LinearAxis.Title>
-                                    <Label FontWeight="Bold" FontFamily="Verdana" FontSize="20px" Content="Bytes"/>
+                                    <Label FontWeight="Bold" FontFamily="Verdana" FontSize="20px" Content="Megabytes"/>
                                 </chartingToolkit:LinearAxis.Title>
                             </chartingToolkit:LinearAxis>
                         </chartingToolkit:Chart.Axes>
@@ -171,25 +171,31 @@
             </TabItem>
     	</TabControl>
         <StatusBar x:Name="statusBar" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
-            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20, 0">
+            <StatusBarItem Margin="20, 0">
                 <TextBlock Text="{Binding StringFormat={}Total Packets: {0},
-                    Path=TotalPackets}" />
+                    Path=TotalPackets}" VerticalAlignment="Center"/>
             </StatusBarItem>
-            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20, 0">
-                <TextBlock Text="{Binding StringFormat={}Total Downloaded: {0}B,
-                    Path=TotalDownloaded}" />
+            <StatusBarItem Margin="20, 0">
+                <TextBlock Text="{Binding StringFormat={}Total Downloaded: {0}MB,
+                    Path=TotalDownloaded}" VerticalAlignment="Center"/>
             </StatusBarItem>
-            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Total Uploaded: {0}B,
-                    Path=TotalUploaded}" />
+            <StatusBarItem Margin="0, 0, 50, 0">
+                <TextBlock Text="{Binding StringFormat={}Total Uploaded: {0}MB,
+                    Path=TotalUploaded}" VerticalAlignment="Center"/>
             </StatusBarItem>
-            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Down Speed: {0} KB/s,
-                    Path=DownloadSpeed}" />
+            <StatusBarItem>
+                <Image Source="Images/Down.png" Height="24" Width="12" Margin="20, 0,-5, 0"/>
             </StatusBarItem>
-            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StringFormat={}Up Speed: {0} KB/s,
-                    Path=UploadSpeed}" />
+            <StatusBarItem>
+                <TextBlock Text="{Binding StringFormat={}{0} KB/s,
+                    Path=DownloadSpeed}" VerticalAlignment="Center"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Image Source="Images/Up.png" Height="24" Width="12" Margin="20, 0, -5, 0" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding StringFormat={}{0} KB/s,
+                    Path=UploadSpeed}" VerticalAlignment="Center" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
