@@ -241,12 +241,12 @@ namespace NetworkMonitor
 
         public decimal TotalDownloaded
         {
-            get { return this.totalDownloaded; }
+            get { return Math.Round(this.totalDownloaded / 1000000, 3); }
         }
 
         public decimal TotalUploaded
         {
-            get { return this.totalUploaded; }
+            get { return Math.Round(this.totalUploaded/1000000, 3); }
         }
 
         public double DownloadSpeed { get; private set; }

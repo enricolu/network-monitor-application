@@ -18,8 +18,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Microsoft.Research.DynamicDataDisplay.Charts;
-using Microsoft.Research.DynamicDataDisplay.Common;
 using NetworkMonitor;
 using ContextMenu = System.Windows.Forms.ContextMenu;
 using Image = System.Drawing.Image;
@@ -60,6 +58,7 @@ namespace NetworkMonitorApplication
             this.notifyIcon.MouseDoubleClick += new MouseEventHandler(notifyIcon_MouseDoubleClick);
 
             ContextMenuStrip iconMenu = new ContextMenuStrip();
+
             iconMenu.Items.Add(new ToolStripMenuItem("Start", new System.Drawing.Bitmap("Images/Play.png"),
                                                      (sender, e) => { btnStart_Click(this, null); }));
             iconMenu.Items.Add(new ToolStripMenuItem("Pause", new System.Drawing.Bitmap("Images/Pause.png"), 
@@ -239,12 +238,12 @@ namespace NetworkMonitorApplication
                 {
                     foreach (var key in downloadedStats.Keys)
                     {
-                        downloaded.Add(new KeyValuePair<byte, decimal>(key, downloadedStats[key]));
+                        downloaded.Add(new KeyValuePair<byte, decimal>(key, downloadedStats[key] / 1000000));
                     }
 
                     foreach (var key in uploadedStats.Keys)
                     {
-                        uploaded.Add(new KeyValuePair<byte, decimal>(key, uploadedStats[key]));
+                        uploaded.Add(new KeyValuePair<byte, decimal>(key, uploadedStats[key] / 1000000));
                     }
                 }));
 
