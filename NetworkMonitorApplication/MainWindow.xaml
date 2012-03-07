@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:NetworkMonitor="clr-namespace:NetworkMonitor;assembly=NetworkMonitor" 
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" xmlns:local="clr-namespace:NetworkMonitorApplication" Title="Network Monitor" Width="800" Height="600" Closed="Window_Closed"
+        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" 
+        xmlns:local="clr-namespace:NetworkMonitorApplication" 
+        Title="Network Monitor" Width="900" Height="600" Closed="Window_Closed"
         Icon="Images/network.ico" StateChanged="Window_StateChanged">
     <Window.Resources>
         <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"
@@ -22,13 +24,22 @@
     <Grid>
         <ToolBar HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="48">
             <Button x:Name="btnStart" Click="btnStart_Click">
-                <Image Source="Images/Play.png" x:Name="imgPlay"/>
+                <Image Source="Images/Play.png"/>
+                <Button.ToolTip>
+                    <Label>Start</Label>
+                </Button.ToolTip>
             </Button>
             <Button x:Name="btnPause" Click="btnPause_Click">
                 <Image Source="Images/Pause.png" />
+                <Button.ToolTip>
+                    <Label>Pause</Label>
+                </Button.ToolTip>
             </Button>
             <Button x:Name="btnExit" Click="btnExit_Click">
                 <Image Source="Images/Exit.png" />
+                <Button.ToolTip>
+                    <Label>Exit</Label>
+                </Button.ToolTip>
             </Button>
         </ToolBar>
     	<TabControl Margin="0,48,0,25">
@@ -101,25 +112,25 @@
 
                     <GroupBox Header="Filter Packets" DockPanel.Dock="Bottom" Margin="20">
                         <StackPanel Orientation="Vertical">
-                            <WrapPanel>
+                            <WrapPanel Margin="5">
                                 <Label FontWeight="Bold">Protocol:</Label>
                                 <ComboBox x:Name="comboProtocols" ItemsSource="{Binding Source={StaticResource protocolEnum}}"
                                     SelectedIndex="0"/>
                             </WrapPanel>
-                            <WrapPanel>
+                            <WrapPanel Margin="5">
                                 <Label FontWeight="Bold">Direction:</Label>
                                 <ComboBox x:Name="comboDirection" ItemsSource="{Binding Source={StaticResource directionEnum}}"
                                     SelectedIndex="0"/>
                             </WrapPanel>
-                            <WrapPanel>
+                            <WrapPanel Margin="5">
                                 <Label FontWeight="Bold">Host:</Label>
                                 <TextBox x:Name="txtHost" Width="150px" />
                             </WrapPanel>
-                            <WrapPanel>
+                            <WrapPanel Margin="5">
                                 <Button x:Name="btnFilter" Click="btnFilter_Click" Width="120px">Filter Packets</Button>
                             </WrapPanel>
                             <WrapPanel>
-                                <local:CircularProgressBar x:Name="progressBarFiltering" Visibility="Collapsed">
+                                <local:CircularProgressBar x:Name="progressBarFiltering" Visibility="Collapsed" Margin="10">
                                     <local:CircularProgressBar.RenderTransform>
                                         <ScaleTransform ScaleX="0.3" ScaleY="0.3" />
                                     </local:CircularProgressBar.RenderTransform>

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// Represents a network adapter 
+    /// </summary>
     [Serializable]
     public class Adapter
     {

@@ -12,6 +12,9 @@ using Timer = System.Timers.Timer;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// The class that controls traffic monitoring
+    /// </summary>
     public class NetworkMonitor : INotifyPropertyChanged
     {
         private NdisHookStubs.NT_PROTOCOL_LIST protocolList;
@@ -44,6 +47,10 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Starts listening to the specified adapters 
+        /// </summary>
+        /// <param name="adaptersToListen">the adapters to listen to</param>
         public void StartListening(List<Adapter> adaptersToListen = null)
         {
             if (adaptersToListen == null)
@@ -56,6 +63,7 @@ namespace NetworkMonitor
             double downloaded = 0;
             double uploaded = 0;
 
+            //get speed information every second
             Timer t = new Timer(1000);
             t.Elapsed += new ElapsedEventHandler((e, o) =>
             {
@@ -77,8 +85,6 @@ namespace NetworkMonitor
 
             while (true)
             {
-                
-
                 NdisHookStubs.NEXT_PACKET nextPacket =
                     NdisHookStubs.NEXT_PACKET.WaitFor();
 
@@ -115,12 +121,21 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Stops the traffic monitoring
+        /// </summary>
         public void PauseListening()
         {
             protocolList.Stop();
             this.SerializePackets(this.Packets.Count, false);
+            this.DownloadSpeed = 0;
+            this.UploadSpeed = 0;
         }
 
+        /// <summary>
+        /// Gets the existing network adapters
+        /// </summary>
+        /// <returns>List of the adapters</returns>
         public List<Adapter> GetAdapters()
         {
             if(protocolList == null)
@@ -137,7 +152,10 @@ namespace NetworkMonitor
 
             return adapters;
         }
-
+        
+        /// <summary>
+        /// Low-level hardware adapter initialization
+        /// </summary>
         private void InitializeProtocolList()
         {
             while (true)
@@ -155,6 +173,11 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Serializes packets into the filesystem
+        /// </summary>
+        /// <param name="packetCount">the packet count to serialize</param>
+        /// <param name="delete">deletes the serialized packets if 'true'</param>
         private void SerializePackets(int packetCount, bool delete = true)
         {
             try
@@ -175,6 +198,10 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Gets back the serialized packets
+        /// </summary>
+        /// <returns>list of all packets</returns>
         public List<Packet> DeserializeAllPackets()
         {
             List<Packet> packets = new List<Packet>();
@@ -192,6 +219,11 @@ namespace NetworkMonitor
             return packets;
         }
 
+        /// <summary>
+        /// Checks if the packet matches a specified filter
+        /// </summary>
+        /// <param name="p">the filterign options</param>
+        /// <returns>true if the packet matches the filter</returns>
         public bool PacketMatchesFilter(Packet p)
         {
             if(this.Filter.Direction != null 
@@ -215,6 +247,9 @@ namespace NetworkMonitor
             return true;
         }
 
+        /// <summary>
+        /// Filters the packets
+        /// </summary>
         public void FilterPackets()
         {
             List<Packet> allPackets = this.DeserializeAllPackets();
@@ -239,11 +274,17 @@ namespace NetworkMonitor
             get { return this.totalPackets; }
         }
 
+        /// <summary>
+        /// The downloaded traffic in Megabytes
+        /// </summary>
         public decimal TotalDownloaded
         {
             get { return Math.Round(this.totalDownloaded / 1000000, 3); }
         }
 
+        /// <summary>
+        /// The uploaded traffic in Megabytes
+        /// </summary>
         public decimal TotalUploaded
         {
             get { return Math.Round(this.totalUploaded/1000000, 3); }

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// Contains options for filtering the packets
+    /// </summary>
     [Serializable]
     public class PacketFilter
     {

@@ -6,6 +6,9 @@ using System.Net;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// List of IP protocols
+    /// </summary>
     [Serializable]
     public enum IpProtocol
     {
@@ -160,6 +163,9 @@ namespace NetworkMonitor
         TUBA = 9	// TUBA.
     }
 
+    /// <summary>
+    /// Contains information about sender/receiver IP addresses
+    /// </summary>
     [Serializable]
     public class IpHeader
     {
@@ -168,32 +174,31 @@ namespace NetworkMonitor
         private const int ADDRESS_LENGTH = 4;
         public const string UNKNOWN_HOST = "Unknown";
 
+        /// <summary>
+        /// Parses the data of the raw packet
+        /// </summary>
+        /// <param name="rawPacket">The raw packet (binary data)</param>
+        /// <param name="macHeader">Lower-level information about the packet</param>
         public IpHeader(RawPacket rawPacket, EthernetHeader macHeader)
         {
             int pos = macHeader.Length;
             Version = (IpVersion)(rawPacket.Data[pos++] >> 4);
-            pos++;
 
-            ushort totalLength = RawPacket.ReadUInt16(rawPacket.Data, pos);
-            pos += 2;
+            int protocolOffset = pos + 8;
+            Protocol = (IpProtocol)rawPacket.Data[protocolOffset++];
 
-            ushort identification = RawPacket.ReadUInt16(rawPacket.Data, pos);
-            pos += 2;
+            int sourceOffset = protocolOffset + 2;
+            ipSource = RawPacket.ReadUInt32(rawPacket.Data, sourceOffset);
 
-            pos += 2;
-            pos++;
-            Protocol = (IpProtocol)rawPacket.Data[pos++];
-
-            ushort headerChecksum = RawPacket.ReadUInt16(rawPacket.Data, pos);
-            pos += 2;
-
-            ipSource = RawPacket.ReadUInt32(rawPacket.Data, pos);
-            pos += 4;
-
-            ipDestination = RawPacket.ReadUInt32(rawPacket.Data, pos);
-            pos += 4;
+            int destinationOffset = sourceOffset + 4;
+            ipDestination = RawPacket.ReadUInt32(rawPacket.Data, destinationOffset);
         }
 
+        /// <summary>
+        /// Converts an uint to string
+        /// </summary>
+        /// <param name="address">uint representaion of the address</param>
+        /// <returns>string representation of the address</returns>
         public static string UintIpAddressToString(uint address)
         {
             string formattedAddress = "";

@@ -45,6 +45,7 @@ namespace NetworkMonitorApplication
 			monitor = new NetworkMonitor.NetworkMonitor();
             dataGridPackets.ItemsSource = monitor.Packets;
             statusBar.DataContext = monitor;
+            btnPause.IsEnabled = false;
 
             this.chartTraffic.Series.Clear();
             InitializeIcon();
@@ -77,7 +78,9 @@ namespace NetworkMonitorApplication
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            worker.DoWork += new DoWorkEventHandler((s, a) =>
+            btnPause.IsEnabled = true;
+            btnStart.IsEnabled = false;
+            worker.DoWork += new DoWorkEventHandler((o, args) =>
             {
                 monitor.StartListening();
             });
@@ -86,7 +89,7 @@ namespace NetworkMonitorApplication
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(5000);
-            timer.Tick += new EventHandler((s, a) =>
+            timer.Tick += new EventHandler((o, args) =>
                 {
                     dataGridPackets.Items.Refresh();
                 });
@@ -96,6 +99,7 @@ namespace NetworkMonitorApplication
 
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
+            btnPause.IsEnabled = false;
             worker.WorkerSupportsCancellation = true;
             worker.CancelAsync();
             worker.Dispose();
@@ -104,8 +108,15 @@ namespace NetworkMonitorApplication
 
         private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Packet selectedPacket = this.monitor.Packets[this.dataGridPackets.SelectedIndex];
-            panelPacketInformation.DataContext = selectedPacket;
+            try
+            {
+                Packet selectedPacket = this.dataGridPackets.SelectedItem as Packet;
+                panelPacketInformation.DataContext = selectedPacket;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -139,12 +150,12 @@ namespace NetworkMonitorApplication
             this.progressBarFiltering.Visibility = Visibility.Visible;
 
             BackgroundWorker filterWorker = new BackgroundWorker();
-            filterWorker.DoWork += new DoWorkEventHandler((a, b) =>
+            filterWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
                 this.monitor.FilterPackets();
             });
             
-            filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
+            filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
             {
                 this.dataGridPackets.ItemsSource = this.monitor.Packets;
                 this.lblFoundPackets.Content = this.monitor.Packets.Count.ToString();
@@ -190,7 +201,7 @@ namespace NetworkMonitorApplication
                 this.chartTraffic.Series.Add(upSeries);
             }
 
-            getStatsWorker.DoWork += new DoWorkEventHandler((a, b) =>
+            getStatsWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
                 List<Packet> allPackets = monitor.DeserializeAllPackets();
                 TrafficStatistics statistics = new TrafficStatistics(allPackets);
@@ -251,7 +262,7 @@ namespace NetworkMonitorApplication
                 statistics.Dispose();
             });
 
-            getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((a, b) =>
+            getStatsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
             {
                 this.progressBarStatistics.Visibility =System.Windows.Visibility.Collapsed;
                 this.chartTraffic.Visibility = System.Windows.Visibility.Visible;

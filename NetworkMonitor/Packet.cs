@@ -14,6 +14,9 @@ namespace NetworkMonitor
         Uploading = 1
     }
 
+    /// <summary>
+    /// Represents an IP packet
+    /// </summary>
     [Serializable]
     public class Packet : RawPacket
     {
@@ -36,7 +39,12 @@ namespace NetworkMonitor
 
             ArrivalTime = DateTime.Now;
         }
-
+        
+        /// <summary>
+        /// Serializes a packet into a file
+        /// </summary>
+        /// <param name="p">The packet to serialize</param>
+        /// <param name="fileName">The packet database file</param>
         public static void Serialize(Packet p, string fileName)
         {
             MemoryStream memoryStream = new MemoryStream();
@@ -50,15 +58,25 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Contains lower-level information about the packet 
+        /// </summary>
         public EthernetHeader EthernetHeader
         {
             get { return this.ethernetHeader; }
         }
+
+        /// <summary>
+        /// Contains higher-level information about the packet
+        /// </summary>
         public IpHeader IpHeader
         {
             get { return this.ipHeader; }
         }
 
+        /// <summary>
+        /// Gets the remote host name
+        /// </summary>
         public String HostName
         {
             get
