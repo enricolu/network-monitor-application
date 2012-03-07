@@ -5,6 +5,9 @@ using System.Text;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// Low-level packet information (array of bytes)
+    /// </summary>
     [Serializable]
     public class RawPacket
     {
@@ -25,11 +28,23 @@ namespace NetworkMonitor
             get { return this.data.Length; }
         }
 
+        /// <summary>
+        /// Converts a byte array to 16-bit uint
+        /// </summary>
+        /// <param name="byteArray">the array to convert</param>
+        /// <param name="pos">starting position</param>
+        /// <returns>the uint</returns>
         public static UInt16 ReadUInt16(byte[] byteArray, int pos)
         {
             return (UInt16) ((byteArray[pos] << 8) | byteArray[pos + 1]);
         }
 
+        /// <summary>
+        /// Converts a byte array to 32-bit uint
+        /// </summary>
+        /// <param name="byteArray">the array to convert</param>
+        /// <param name="pos">the starting position</param>
+        /// <returns>the uint</returns>
         public static UInt32 ReadUInt32(byte[] byteArray, int pos)
         {
             return (UInt32) (

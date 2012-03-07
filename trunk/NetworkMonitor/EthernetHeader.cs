@@ -5,6 +5,9 @@ using System.Text;
 
 namespace NetworkMonitor
 {
+    /// <summary>
+    /// Contains lowe-level information about the packet
+    /// </summary>
     [Serializable]
     public class EthernetHeader
     {
@@ -13,6 +16,10 @@ namespace NetworkMonitor
         private byte[] macDestination = new byte[6];
         private byte[] macSource = new byte[6];
 
+        /// <summary>
+        /// Parses the raw binary data
+        /// </summary>
+        /// <param name="data">raw data</param>
         public EthernetHeader(byte[] data)
         {
             if (data == null || data.Length < DEFAULT_LENGTH)
@@ -27,6 +34,11 @@ namespace NetworkMonitor
             }
         }
 
+        /// <summary>
+        /// Converts the MAC address to a string
+        /// </summary>
+        /// <param name="address">binary representation of the address</param>
+        /// <returns>string representation of the address</returns>
         public static string MacAddressToString(byte[] address)
         {
             if (address == null || address.Length != ADDRESS_LENGTH)
