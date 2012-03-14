@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorApplication",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitor", "NetworkMonitor\NetworkMonitor.csproj", "{31E0FF4D-16EC-4FBA-BB74-9BD1298A82FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMonitorTest", "NetworkMonitorTest\NetworkMonitorTest.csproj", "{80726673-764D-4AB9-AD11-80743A42A7E2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,16 +35,6 @@ Global
 		{31E0FF4D-16EC-4FBA-BB74-9BD1298A82FC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{31E0FF4D-16EC-4FBA-BB74-9BD1298A82FC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{31E0FF4D-16EC-4FBA-BB74-9BD1298A82FC}.Release|x86.ActiveCfg = Release|Any CPU
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Debug|x86.ActiveCfg = Debug|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Debug|x86.Build.0 = Debug|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Release|Any CPU.ActiveCfg = Release|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Release|Mixed Platforms.Build.0 = Release|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Release|x86.ActiveCfg = Release|x86
-		{80726673-764D-4AB9-AD11-80743A42A7E2}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

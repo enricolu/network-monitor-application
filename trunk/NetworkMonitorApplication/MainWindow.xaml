@@ -5,7 +5,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" 
         xmlns:local="clr-namespace:NetworkMonitorApplication" 
-        Title="Network Monitor" Width="900" Height="600" Closed="Window_Closed"
+        Title="Network Monitor" Width="900" Height="650" Closed="Window_Closed"
         Icon="Images/network.ico" StateChanged="Window_StateChanged">
     <Window.Resources>
         <ObjectDataProvider x:Key="protocolEnum" MethodName="GetValues"

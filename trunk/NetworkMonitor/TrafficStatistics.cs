@@ -6,7 +6,7 @@ using System.Text;
 namespace NetworkMonitor
 {
     /// <summary>
-    /// Contains statistical information about the traffic
+    /// Generates statistical information about the traffic
     /// </summary>
     public class TrafficStatistics : IDisposable
     {
