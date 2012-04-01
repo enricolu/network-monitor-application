@@ -1,6 +1,6 @@
 TODO:
 	[done] create UI (panel or new window) for filtering packets
-	[working...] create UI for showing traffic statistics
+	[done] create UI for showing traffic statistics
 	- create UI for showing visited sites statistics
 	-create gadget-style window for showing speed/traffic 
 

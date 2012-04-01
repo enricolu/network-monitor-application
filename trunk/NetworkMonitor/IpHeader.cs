@@ -242,7 +242,7 @@ namespace NetworkMonitor
             }
         }
 
-        public string  SourceHostName
+        public string SourceHostName
         {
             get
             {
