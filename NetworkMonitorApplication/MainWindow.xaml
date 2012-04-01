@@ -55,12 +55,14 @@
                                 <DataGridTextColumn Header="Time"
                                     Binding="{Binding ArrivalTime}" />
                                 <DataGridTextColumn Header="Source IP" 
-						            Binding="{Binding IpHeader.SourceIpAddress}" />
+						            Binding="{Binding SourceIpAddress}" />
 						        <DataGridTextColumn Header="Destination IP" 
-							        Binding="{Binding IpHeader.DestinationIpAddress}" />
+							        Binding="{Binding DestinationIpAddress}" />
                                 <DataGridComboBoxColumn Header="Protocol"
-                                    SelectedItemBinding="{Binding Path=IpHeader.Protocol, Mode=OneWay}"  
+                                    SelectedItemBinding="{Binding Path=Protocol, Mode=OneWay}"  
                                     ItemsSource="{Binding Source={StaticResource protocolEnum}}" />
+                                <DataGridTextColumn Header="Application"
+                                    Binding="{Binding Path=ProcessName}" />
                                 <DataGridTextColumn Header="Size (in bytes)"
                                     Binding="{Binding Size}" />  
                                 <DataGridComboBoxColumn Header="Direction"
@@ -76,19 +78,19 @@
                         <StackPanel Orientation="Vertical">
                             <WrapPanel>
                                 <Label FontWeight="Bold">Source IP:</Label>
-                                <Label Content="{Binding IpHeader.SourceIpAddress}" />
+                                <Label Content="{Binding .SourceIpAddress}" />
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Destination IP:</Label>
-                                <Label Content="{Binding IpHeader.DestinationIpAddress}" />
+                                <Label Content="{Binding .DestinationIpAddress}" />
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Source MAC:</Label>
-                                <Label Content="{Binding EthernetHeader.SourceMacAddress}" />
+                                <Label Content="{Binding SourceMacAddress}" />
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Destination MAC:</Label>
-                                <Label Content="{Binding EthernetHeader.DestinationMacAddress}" />
+                                <Label Content="{Binding DestinationMacAddress}" />
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Remote Host:</Label>
@@ -100,7 +102,7 @@
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Protocol:</Label>
-                                <Label Content="{Binding IpHeader.Protocol}" />
+                                <Label Content="{Binding Protocol}" />
                             </WrapPanel>
                             <WrapPanel>
                                 <Label FontWeight="Bold">Direction:</Label>

@@ -34,6 +34,9 @@
     <Reference Include="NmExtension">
       <HintPath>..\NetworkMonitorTest\bin\Debug\NmExtension.dll</HintPath>
     </Reference>
+    <Reference Include="NtTdiApiWrapper">
+      <HintPath>..\..\NTLocalNetworkMonitorSamples\Example\CSharp\NtTdiApiWrapper\bin\Debug\NtTdiApiWrapper.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

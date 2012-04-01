@@ -14,7 +14,6 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NmExtension.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.pdb
-E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\DynamicDataDisplay.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\DynamicDataDisplay.xml
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\ru-ru\DynamicDataDisplay.resources.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\System.Windows.Controls.DataVisualization.Toolkit.dll
@@ -26,3 +25,5 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\NetworkMonitorApplication_MarkupCompile.lref
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\CircularProgressBar.baml
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\CircularProgressBar.g.cs
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.pdb

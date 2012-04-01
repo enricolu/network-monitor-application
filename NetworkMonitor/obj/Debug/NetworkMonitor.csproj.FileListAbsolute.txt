@@ -4,3 +4,5 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\Re
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\NetworkMonitor.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\NetworkMonitor.pdb
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NmExtension.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NtTdiApiWrapper.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NtTdiApiWrapper.pdb

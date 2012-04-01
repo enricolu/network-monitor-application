@@ -11,22 +11,19 @@ namespace NetworkMonitor
     [Serializable]
     public class RawPacket
     {
-        protected byte[] data;
-
         public RawPacket(byte[] data)
         {
-            this.data = data;
+            this.Data = data;
+            this.Size = data.Length;
         }
 
-        public byte[] Data
+        public RawPacket()
         {
-            get { return this.data; }
         }
 
-        public int Size
-        {
-            get { return this.data.Length; }
-        }
+        public byte[] Data { get; protected set; }
+
+        public int Size { get; protected set; }
 
         /// <summary>
         /// Converts a byte array to 16-bit uint
