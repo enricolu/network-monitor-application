@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Timers;
@@ -301,9 +302,9 @@ namespace NetworkMonitor
 
     public class NetworkMonitor : INotifyPropertyChanged
     {
-        private int driver = 0;
         private IntPtr buffer;
         private uint bufferSize = 0x10000;
+        private int driver = 0;
 		private List<Packet> packets = new List<Packet>();
         private bool listening = true;
         private const int PACKET_BUFFER = 25;
@@ -315,13 +316,12 @@ namespace NetworkMonitor
         public event PropertyChangedEventHandler PropertyChanged;
 
         public NetworkMonitor()
-        {   
+        {
             totalPackets = 0;
             totalDownloaded = 0;
             totalUploaded = 0;
             this.Filter = new PacketFilter();
             this.TrafficStatistics = new TrafficStatistics(this.packets);
-            InitializeDriver();
         }
 
         protected void NotifyPropertyChanged(string property)
@@ -336,19 +336,19 @@ namespace NetworkMonitor
         {
             FILTER_INFO filterInfo;
             driver = NtTdiApi.OpenFilterDriverW(NtTdiApi.NTTDIDR_DRIVER_NAMEW);
-            if(driver == 0)
+            if (driver == 0)
             {
                 throw new Exception("Cannot open driver");
             }
 
             uint driverVersion = NtTdiApi.GetDriverVersion(driver);
-            if(driverVersion != NtTdiApi.NTTDIDR_DRIVER_VERSION)
+            if (driverVersion != NtTdiApi.NTTDIDR_DRIVER_VERSION)
             {
                 throw new Exception("Unsupported driver version");
             }
 
             buffer = Marshal.AllocHGlobal(new IntPtr(bufferSize));
-            if(buffer == IntPtr.Zero)
+            if (buffer == IntPtr.Zero)
             {
                 throw new Exception(string.Format("Cannot allocate {0} bytes", bufferSize));
             }
@@ -359,7 +359,7 @@ namespace NetworkMonitor
             filterInfo = new FILTER_INFO(1,
                 NtTdiApi.EVENT_MASK_FULL,
                 NtTdiApi.FLT_ACTION_LOG,
-                0, 
+                0,
                 0x00000000,
                 0x00000000,
                 0,
@@ -372,16 +372,17 @@ namespace NetworkMonitor
 
             if (!NtTdiApi.AddStaticFilter(driver, filterInfo))
             {
-                throw new Exception("Cannot add filter");
+                throw new Exception("Cannot set filter");
             }
         }
 
         /// <summary>
-        /// Starts listening 
+        /// Starts capturing the packets
         /// </summary>
         public void StartListening()
         {
-            listening = true;
+            InitializeDriver();
+
             double downloaded = 0;
             double uploaded = 0;
 
@@ -405,22 +406,71 @@ namespace NetworkMonitor
             });
             t.Start();
 
+            int i = 0, j = 0, error = 0;
+            uint bytesProcessed = 0;
+            LOG_INFO logInfo;
+            string protocol;
+
             while (listening)
             {
                 uint bytesRead = bufferSize;
-                uint bytesProcessed = 0;
-                LOG_INFO logInfo;
 
-                if(!NtTdiApi.ReadLogEx(driver, buffer, ref bytesRead))
+                if (NtTdiApi.ReadLogEx(driver, buffer, ref bytesRead))
                 {
-                    if(Marshal.GetLastWin32Error() == 122)  //ERROR_INSUFFICIENT_BUFFER
+                    
+                    i++;
+                    bytesProcessed = 0;
+
+                    for (j = 0; bytesProcessed < bytesRead; j++)
+                    {
+                        IntPtr currentPtr = new IntPtr(buffer.ToInt32() + bytesProcessed);
+                        logInfo = (LOG_INFO)Marshal.PtrToStructure(currentPtr, typeof(LOG_INFO));
+
+                        if(logInfo.m_LocalAddress.m_Ip != 0 && logInfo.m_RemoteAddress.m_Ip != 0)
+                        {
+                            Packet p = new Packet(logInfo);
+
+                            packets.Add(p);
+                            NotifyPropertyChanged("Packets");
+
+                            totalPackets++;
+                            NotifyPropertyChanged("TotalPackets");
+
+                            if (p.PacketDirection == PacketDirection.Downloading)
+                            {
+                                totalDownloaded += p.Size;
+                                downloaded += (ulong)p.Size;
+                                NotifyPropertyChanged("TotalDownloaded");
+                            }
+                            else if (p.PacketDirection ==
+                                     PacketDirection.Uploading)
+                            {
+                                totalUploaded += p.Size;
+                                uploaded += (ulong)p.Size;
+                                NotifyPropertyChanged("TotalUploaded");
+                            }
+
+                            if (this.packets.Count >= PACKET_BUFFER * 2)
+                            {
+                                SerializePackets(PACKET_BUFFER);
+                            }
+                        }
+
+                        bytesProcessed += Convert.ToUInt32(Marshal.SizeOf(typeof(LOG_INFO))) + logInfo.m_DataLength;
+                    }
+                }
+                else
+                {
+                    error = Marshal.GetLastWin32Error();
+
+                    if (error == 122/*ERROR_INSUFFICIENT_BUFFER*/)
                     {
                         bufferSize += 0x1000;
                         buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(bufferSize));
 
                         if (buffer == IntPtr.Zero)
                         {
-                            throw new Exception(string.Format("Cannot allocate {0} bytes. Abort", bufferSize));
+                            throw new Exception(string.Format("Cannot allocate {0} bytes! abort", bufferSize));
                         }
                     }
 
@@ -433,46 +483,7 @@ namespace NetworkMonitor
                         Thread.Sleep(1000);
                     }
                 }
-
-                bytesProcessed = 0;
-                for (int i = 0; bytesProcessed < bytesRead; i++)
-                {
-                    IntPtr currentPtr = new IntPtr(buffer.ToInt32() + bytesProcessed);
-                    logInfo = (LOG_INFO) Marshal.PtrToStructure(currentPtr, typeof (LOG_INFO));
-
-                    Packet p = new Packet(logInfo);
-                    
-
-                    if (!string.IsNullOrEmpty(p.DestinationIpAddress) && !string.IsNullOrEmpty(p.SourceIpAddress))
-                    {
-                        packets.Add(p);
-                        NotifyPropertyChanged("Packets");
-
-                        totalPackets++;
-                        NotifyPropertyChanged("TotalPackets");
-
-                        if (p.PacketDirection == PacketDirection.Downloading)
-                        {
-                            totalDownloaded += p.Size;
-                            downloaded += (ulong) p.Size;
-                            NotifyPropertyChanged("TotalDownloaded");
-                        }
-                        else if (p.PacketDirection ==
-                                 PacketDirection.Uploading)
-                        {
-                            totalUploaded += p.Size;
-                            uploaded += (ulong) p.Size;
-                            NotifyPropertyChanged("TotalUploaded");
-                        }
-
-                        if (this.packets.Count >= PACKET_BUFFER*2)
-                        {
-                            SerializePackets(PACKET_BUFFER);
-                        }
-                    }
-
-                    bytesProcessed += Convert.ToUInt32(Marshal.SizeOf(typeof(LOG_INFO))) + logInfo.m_DataLength;
-                }
+                
             }
         }
 

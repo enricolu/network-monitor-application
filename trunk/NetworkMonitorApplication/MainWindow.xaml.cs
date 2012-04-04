@@ -82,7 +82,15 @@ namespace NetworkMonitorApplication
             btnStart.IsEnabled = false;
             worker.DoWork += new DoWorkEventHandler((o, args) =>
             {
-                monitor.StartListening();
+                try
+                {
+                    monitor.StartListening();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.StackTrace, ex.Message);
+                }
+                
             });
 
             worker.RunWorkerAsync();
