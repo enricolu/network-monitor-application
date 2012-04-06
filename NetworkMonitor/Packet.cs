@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.IO;
 using NtTdiApiWrapper;
+using SevenZip;
 
 namespace NetworkMonitor
 {
@@ -75,21 +76,44 @@ namespace NetworkMonitor
             return endPoint.ToString();
         }
 
-        /// <summary>
-        /// Serializes a packet into a file
-        /// </summary>
-        /// <param name="p">The packet to serialize</param>
-        /// <param name="fileName">The packet database file</param>
-        public static void Serialize(Packet p, string fileName)
+        private static void CompressPacket(Packet packet, MemoryStream outStream)
         {
+            SevenZipCompressor.SetLibraryPath(@"7z.dll");
+            SevenZip.SevenZipCompressor compressor = new SevenZipCompressor();
             MemoryStream memoryStream = new MemoryStream();
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            binaryFormatter.Serialize(memoryStream, p);
-            string base64Str = System.Convert.ToBase64String(memoryStream.ToArray());
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, packet);
+            compressor.CompressStream(memoryStream, outStream);
 
-            using(StreamWriter writer = new StreamWriter(fileName, true))
+            memoryStream.Close();
+            outStream.Position = 0;
+        }
+
+        internal static void DecompressPacket(byte[] compressedData, Stream outStream)
+        {
+            SevenZipCompressor.SetLibraryPath(@"7z.dll");
+            MemoryStream inStream = new MemoryStream(compressedData);
+            SevenZipExtractor extractor = new SevenZipExtractor(inStream);
+            extractor.ExtractFile(0, outStream);
+            outStream.Position = 0;
+        }
+
+        public static void SerializePacket(Packet packet, string fileName)
+        {
+            using (FileStream fileStream = new FileStream(fileName, FileMode.Append))
             {
-                writer.WriteLine(base64Str);
+                MemoryStream compressedPacketStream = new MemoryStream();
+                CompressPacket(packet, compressedPacketStream);
+
+                BinaryWriter writer = new BinaryWriter(fileStream);
+                writer.Write(compressedPacketStream.Capacity);
+                compressedPacketStream.WriteTo(fileStream);
+                long zipSignatureLength = compressedPacketStream.Capacity - compressedPacketStream.Length;
+                byte[] zipSignature = new byte[zipSignatureLength];
+                writer.Write(zipSignature);
+
+                compressedPacketStream.Close();
+                writer.Close();
             }
         }
 
@@ -102,11 +126,11 @@ namespace NetworkMonitor
             {
                 try
                 {
-                    string ip = this.DestinationIpAddress;
+                    string ip = this.DestinationIpAddress.Split(':')[0];
 
                     if(PacketDirection == PacketDirection.Downloading)
                     {
-                        ip = this.SourceIpAddress;
+                        ip = this.SourceIpAddress.Split(':')[0];
                     }
 
                     return Dns.GetHostEntry(ip).HostName;

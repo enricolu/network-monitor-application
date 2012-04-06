@@ -43,7 +43,16 @@ namespace NetworkMonitorApplication
                 new FrameworkPropertyMetadata { DefaultValue = 20 });
 
 			monitor = new NetworkMonitor.NetworkMonitor();
-            dataGridPackets.ItemsSource = monitor.Packets;
+            monitor.PacketReceived += new PacketReceviedEventHandler((p) =>
+            {
+                Dispatcher.BeginInvoke(
+                    new Action(() =>
+                    {
+                        this.dataGridPackets.Items.Add(p);
+                    }));
+
+            });
+
             statusBar.DataContext = monitor;
             btnPause.IsEnabled = false;
 
@@ -85,6 +94,7 @@ namespace NetworkMonitorApplication
                 try
                 {
                     monitor.StartListening();
+
                 }
                 catch (Exception ex)
                 {
@@ -107,11 +117,19 @@ namespace NetworkMonitorApplication
 
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
+            Thread.Sleep(1);
             btnPause.IsEnabled = false;
             worker.WorkerSupportsCancellation = true;
             worker.CancelAsync();
             worker.Dispose();
-            monitor.PauseListening();
+
+            BackgroundWorker pauseWorker = new BackgroundWorker();
+            pauseWorker.DoWork += new DoWorkEventHandler((o, args) =>
+                                                             {
+                                                                 monitor.PauseListening();
+                                                             });
+            pauseWorker.RunWorkerAsync();
+            
         }
 
         private void dataGridPackets_MouseDown(object sender, MouseButtonEventArgs e)
@@ -158,15 +176,21 @@ namespace NetworkMonitorApplication
             this.progressBarFiltering.Visibility = Visibility.Visible;
 
             BackgroundWorker filterWorker = new BackgroundWorker();
+            var foundPackets = new List<Packet>();
             filterWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
-                this.monitor.FilterPackets();
+                foundPackets = monitor.FilterPackets();
+
             });
             
             filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
             {
-                this.dataGridPackets.ItemsSource = this.monitor.Packets;
-                this.lblFoundPackets.Content = this.monitor.Packets.Count.ToString();
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.dataGridPackets.ItemsSource = foundPackets;
+                }));
+
+                this.lblFoundPackets.Content = foundPackets.Count.ToString();
                 this.progressBarFiltering.Visibility = Visibility.Collapsed;
             });
             

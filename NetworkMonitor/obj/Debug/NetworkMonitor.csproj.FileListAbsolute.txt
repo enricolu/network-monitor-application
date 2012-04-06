@@ -6,3 +6,4 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\obj\Debug\Ne
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NmExtension.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NtTdiApiWrapper.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\NtTdiApiWrapper.pdb
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitor\bin\Debug\SevenZipSharp.dll
