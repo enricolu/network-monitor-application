@@ -37,6 +37,9 @@
     <Reference Include="NtTdiApiWrapper">
       <HintPath>..\..\NTLocalNetworkMonitorSamples\Example\CSharp\NtTdiApiWrapper\bin\Debug\NtTdiApiWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="SevenZipSharp">
+      <HintPath>C:\Documents and Settings\User\My Documents\SevenZipSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
