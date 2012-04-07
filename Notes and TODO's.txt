@@ -2,9 +2,10 @@ TODO:
 	[done] create UI (panel or new window) for filtering packets
 	[done] create UI for showing traffic statistics
 	- create UI for showing visited sites statistics
-	-create gadget-style window for showing speed/traffic 
+	[working...] create gadget-style window for showing speed/traffic 
+	- implement feature to generate reports
 
 Notes:
 	[working...] packets could be stored in a database
 	[done] better looking progressbar for filtering packets
-	- mousedown event on datagridpackets randomly thrown an exeption (empy datagrid on load)
+	[done] mousedown event on datagridpackets randomly thrown an exeption (empy datagrid on load)

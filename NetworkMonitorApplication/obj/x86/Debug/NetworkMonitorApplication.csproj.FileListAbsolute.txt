@@ -12,7 +12,6 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\NetworkMonitorApplication.exe
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\NetworkMonitorApplication.pdb
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.dll
-E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NmExtension.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NetworkMonitor.pdb
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\System.Windows.Controls.DataVisualization.Toolkit.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\WPFToolkit.dll
@@ -26,3 +25,5 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.pdb
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\SevenZipSharp.dll
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\TrafficGadget.baml
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\TrafficGadget.g.cs
