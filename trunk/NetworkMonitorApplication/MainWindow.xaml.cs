@@ -69,6 +69,7 @@ namespace NetworkMonitorApplication
 
             ContextMenuStrip iconMenu = new ContextMenuStrip();
 
+            iconMenu.Items.Add(new ToolStripMenuItem("Show Widget", null, new EventHandler(ShowGadget)));
             iconMenu.Items.Add(new ToolStripMenuItem("Start", new System.Drawing.Bitmap("Images/Play.png"),
                                                      (sender, e) => { btnStart_Click(this, null); }));
             iconMenu.Items.Add(new ToolStripMenuItem("Pause", new System.Drawing.Bitmap("Images/Pause.png"), 
@@ -83,6 +84,12 @@ namespace NetworkMonitorApplication
         {
             Show();
             WindowState = WindowState.Normal;
+        }
+
+        private void ShowGadget(object sender, EventArgs e)
+        {
+            TrafficGadget gadget = new TrafficGadget(monitor);
+            gadget.Show();
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
