@@ -52,6 +52,7 @@
     <Compile Include="Adapter.cs" />
     <Compile Include="EthernetHeader.cs" />
     <Compile Include="IpHeader.cs" />
+    <Compile Include="LZF.cs" />
     <Compile Include="NetworkMonitor.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="PacketFilter.cs" />
