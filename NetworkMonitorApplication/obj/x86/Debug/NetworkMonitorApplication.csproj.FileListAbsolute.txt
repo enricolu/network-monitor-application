@@ -24,6 +24,6 @@ E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\o
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\CircularProgressBar.g.cs
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NtTdiApiWrapper.pdb
-E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\SevenZipSharp.dll
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\TrafficGadget.baml
 E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\obj\x86\Debug\TrafficGadget.g.cs
+E:\Dev\Projects\Networking\NetworkMonitorApplication\NetworkMonitorApplication\bin\Debug\NmExtension.dll

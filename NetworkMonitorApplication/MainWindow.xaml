@@ -124,7 +124,7 @@
                                 <Button x:Name="btnFilter" Click="btnFilter_Click" Width="120px">Filter Packets</Button>
                             </WrapPanel>
                             <WrapPanel>
-                                <local:CircularProgressBar x:Name="progressBarFiltering" Visibility="Collapsed" Margin="10">
+                                <local:CircularProgressBar x:Name="progressBarFiltering" Visibility="Collapsed" Margin="20" Width="30" Height="30">
                                     <local:CircularProgressBar.RenderTransform>
                                         <ScaleTransform ScaleX="0.3" ScaleY="0.3" />
                                     </local:CircularProgressBar.RenderTransform>
@@ -201,6 +201,9 @@
             <StatusBarItem>
                 <TextBlock Text="{Binding StringFormat={}{0} KB/s,
                     Path=UploadSpeed}" VerticalAlignment="Center" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <Label x:Name="lblStatus" Margin="20, 0"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

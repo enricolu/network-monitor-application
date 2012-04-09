@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using NetworkMonitor;
+using Binding = System.Windows.Data.Binding;
 using ContextMenu = System.Windows.Forms.ContextMenu;
 using Image = System.Drawing.Image;
 using MenuItem = System.Windows.Forms.MenuItem;
@@ -96,6 +97,8 @@ namespace NetworkMonitorApplication
         {
             btnPause.IsEnabled = true;
             btnStart.IsEnabled = false;
+            lblStatus.Content = "Capturing packets...";
+
             worker.DoWork += new DoWorkEventHandler((o, args) =>
             {
                 try
@@ -111,30 +114,30 @@ namespace NetworkMonitorApplication
             });
 
             worker.RunWorkerAsync();
-
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(5000);
-            timer.Tick += new EventHandler((o, args) =>
-                {
-                    dataGridPackets.Items.Refresh();
-                });
-
-            timer.Start();
         }
 
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
             Thread.Sleep(1);
             btnPause.IsEnabled = false;
-            worker.WorkerSupportsCancellation = true;
-            worker.CancelAsync();
-            worker.Dispose();
+            this.lblStatus.Content = "Saving packets...";
+            //worker.WorkerSupportsCancellation = true;
+            //worker.CancelAsync();
+            //worker.Dispose();
 
             BackgroundWorker pauseWorker = new BackgroundWorker();
             pauseWorker.DoWork += new DoWorkEventHandler((o, args) =>
-                                                             {
-                                                                 monitor.PauseListening();
-                                                             });
+            {
+                monitor.PauseListening();
+                                                                 
+                foreach (var p in dataGridPackets.Items)
+                {
+                    Packet.SerializePacket((Packet)p, "packets.bin");
+                }
+
+                Dispatcher.BeginInvoke(new Action(() => { this.lblStatus.Content = "Done"; }));
+            });
+
             pauseWorker.RunWorkerAsync();
             
         }
@@ -184,20 +187,29 @@ namespace NetworkMonitorApplication
 
             BackgroundWorker filterWorker = new BackgroundWorker();
             var foundPackets = new List<Packet>();
+
+            Binding b = new Binding("Items.Count");
+            b.Source = dataGridPackets;
+            b.Mode = BindingMode.OneWay;
+            this.lblFoundPackets.SetBinding(ContentProperty, b);
+
             filterWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
-                foundPackets = monitor.FilterPackets();
-
+                var allPackets = this.dataGridPackets.Items.Cast<Packet>().ToList();
+                Dispatcher.BeginInvoke(new Action(() => { this.dataGridPackets.Items.Clear(); }));
+                foundPackets = monitor.FilterPackets(allPackets);
+                
             });
             
             filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.dataGridPackets.ItemsSource = foundPackets;
-                }));
+                //Dispatcher.BeginInvoke(new Action(() =>
+                //{
+                //    this.dataGridPackets.Items.Clear();
+                //    this.dataGridPackets.ItemsSource = foundPackets;
+                //}));
 
-                this.lblFoundPackets.Content = foundPackets.Count.ToString();
+                //this.lblFoundPackets.Content = foundPackets.Count.ToString();
                 this.progressBarFiltering.Visibility = Visibility.Collapsed;
             });
             

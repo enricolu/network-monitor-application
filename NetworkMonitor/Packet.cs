@@ -6,7 +6,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.IO;
 using NtTdiApiWrapper;
-using SevenZip;
 
 namespace NetworkMonitor
 {
@@ -76,25 +75,31 @@ namespace NetworkMonitor
             return endPoint.ToString();
         }
 
-        private static void CompressPacket(Packet packet, MemoryStream outStream)
+        private static void CompressPacket(Packet packet, out MemoryStream outStream)
         {
-            SevenZipCompressor.SetLibraryPath(@"7z.dll");
-            SevenZip.SevenZipCompressor compressor = new SevenZipCompressor();
             MemoryStream memoryStream = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(memoryStream, packet);
-            compressor.CompressStream(memoryStream, outStream);
+
+            byte[] input = memoryStream.ToArray();
+            byte[] output = new byte[input.Length + 1];
+            LZF compressor = new LZF();
+            int outLength = compressor.Compress(input, input.Length, output, output.Length);
+            output = output.Take(outLength).ToArray();
+            outStream = new MemoryStream(output);
 
             memoryStream.Close();
             outStream.Position = 0;
         }
 
-        internal static void DecompressPacket(byte[] compressedData, Stream outStream)
+        internal static void DecompressPacket(byte[] compressedData, out MemoryStream outStream)
         {
-            SevenZipCompressor.SetLibraryPath(@"7z.dll");
-            MemoryStream inStream = new MemoryStream(compressedData);
-            SevenZipExtractor extractor = new SevenZipExtractor(inStream);
-            extractor.ExtractFile(0, outStream);
+            byte[] decompressed = new byte[1000];
+            LZF decompressor = new LZF();
+            int decompressedLength = decompressor.Decompress(compressedData, compressedData.Length, decompressed, decompressed.Length);
+            decompressed = decompressed.Take(decompressedLength).ToArray();
+
+            outStream = new MemoryStream(decompressed);
             outStream.Position = 0;
         }
 
@@ -103,14 +108,11 @@ namespace NetworkMonitor
             using (FileStream fileStream = new FileStream(fileName, FileMode.Append))
             {
                 MemoryStream compressedPacketStream = new MemoryStream();
-                CompressPacket(packet, compressedPacketStream);
+                CompressPacket(packet, out compressedPacketStream);
 
                 BinaryWriter writer = new BinaryWriter(fileStream);
                 writer.Write(compressedPacketStream.Capacity);
                 compressedPacketStream.WriteTo(fileStream);
-                long zipSignatureLength = compressedPacketStream.Capacity - compressedPacketStream.Length;
-                byte[] zipSignature = new byte[zipSignatureLength];
-                writer.Write(zipSignature);
 
                 compressedPacketStream.Close();
                 writer.Close();

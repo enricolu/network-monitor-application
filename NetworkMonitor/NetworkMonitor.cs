@@ -155,7 +155,7 @@ namespace NetworkMonitor
                         {
                             Packet p = new Packet(logInfo);
                             OnPacketReceived(p);
-                            Packet.SerializePacket(p, PACKET_DATABASE);
+                            //Packet.SerializePacket(p, PACKET_DATABASE);
 
                             totalPackets++;
                             NotifyPropertyChanged("TotalPackets");
@@ -236,7 +236,7 @@ namespace NetworkMonitor
                 {
                     byte[] packetData = binaryReader.ReadBytes(packetSize);
                     MemoryStream packetStream = new MemoryStream();
-                    Packet.DecompressPacket(packetData, packetStream);
+                    Packet.DecompressPacket(packetData, out packetStream);
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
                     Packet p = (Packet)binaryFormatter.Deserialize(packetStream);
                     packets.Add(p);
@@ -277,12 +277,25 @@ namespace NetworkMonitor
         /// <summary>
         /// Filters the packets
         /// </summary>
-        public List<Packet> FilterPackets()
+        public List<Packet> FilterPackets(List<Packet> allPackets = null)
         {
-            List<Packet> allPackets = this.DeserializeAllPackets();
-            List<Packet> filtered = (from p in allPackets
-                                     where PacketMatchesFilter(p)
-                                     select p).ToList();
+            if (allPackets == null)
+            {
+                allPackets = this.DeserializeAllPackets();
+            }
+
+            List<Packet> filtered = new List<Packet>();//(from p in allPackets
+            //                         where PacketMatchesFilter(p)
+            //                         select p).ToList();
+            foreach (var packet in allPackets)
+            {
+                if (PacketMatchesFilter(packet))
+                {
+                    filtered.Add(packet);
+                    OnPacketReceived(packet);
+                }
+            }
+
             return filtered;
         }
 		
