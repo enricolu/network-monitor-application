@@ -233,6 +233,25 @@ namespace NetworkMonitor
             return result;
         }
 
+        public Dictionary<string, long> GetApplicationStatistics()
+        {
+            Dictionary<string, long> result = new Dictionary<string, long>();
+
+            foreach (var packet in this.packets)
+            {
+                if(!result.ContainsKey(packet.ProcessName))
+                {
+                    result.Add(packet.ProcessName, packet.Size);
+                }
+                else
+                {
+                    result[packet.ProcessName] += packet.Size;
+                }
+            }
+
+            return result;
+        }
+
         public void Dispose()
         {
             this.packets.Clear();
