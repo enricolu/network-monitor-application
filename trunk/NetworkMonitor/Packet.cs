@@ -75,7 +75,7 @@ namespace NetworkMonitor
             return endPoint.ToString();
         }
 
-        private static void CompressPacket(Packet packet, out MemoryStream outStream)
+        internal static void CompressPacket(Packet packet, out MemoryStream outStream)
         {
             MemoryStream memoryStream = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();
@@ -101,22 +101,6 @@ namespace NetworkMonitor
 
             outStream = new MemoryStream(decompressed);
             outStream.Position = 0;
-        }
-
-        public static void SerializePacket(Packet packet, string fileName)
-        {
-            using (FileStream fileStream = new FileStream(fileName, FileMode.Append))
-            {
-                MemoryStream compressedPacketStream = new MemoryStream();
-                CompressPacket(packet, out compressedPacketStream);
-
-                BinaryWriter writer = new BinaryWriter(fileStream);
-                writer.Write(compressedPacketStream.Capacity);
-                compressedPacketStream.WriteTo(fileStream);
-
-                compressedPacketStream.Close();
-                writer.Close();
-            }
         }
 
         /// <summary>

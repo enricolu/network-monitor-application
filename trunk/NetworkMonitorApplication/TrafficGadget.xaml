@@ -1,7 +1,7 @@
 ﻿<Window x:Class="NetworkMonitorApplication.TrafficGadget"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TrafficGadget" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight"
+        Title="TrafficGadget" Width="300" Height="Auto" SizeToContent="Height"
         AllowsTransparency="True" WindowStyle="None" Background="Transparent"
         ShowInTaskbar="False" WindowStartupLocation="Manual" Topmost="True"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
@@ -23,7 +23,7 @@
         <Border Padding="10">
             <StackPanel>
                 <WrapPanel HorizontalAlignment="Right">
-                    <Button Background="Red" Foreground="White" x:Name="btnClose" Click="btnClose_Click" Padding="3">X</Button>
+                    <Button Background="Red" Foreground="White" x:Name="btnClose" FontSize="9" Click="btnClose_Click" Padding="3, 0">X</Button>
                 </WrapPanel>
                 <WrapPanel>
                     <Label>Speed:</Label>

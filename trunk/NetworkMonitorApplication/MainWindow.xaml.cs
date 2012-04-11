@@ -121,19 +121,11 @@ namespace NetworkMonitorApplication
             Thread.Sleep(1);
             btnPause.IsEnabled = false;
             this.lblStatus.Content = "Saving packets...";
-            //worker.WorkerSupportsCancellation = true;
-            //worker.CancelAsync();
-            //worker.Dispose();
 
             BackgroundWorker pauseWorker = new BackgroundWorker();
             pauseWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
                 monitor.PauseListening();
-                                                                 
-                foreach (var p in dataGridPackets.Items)
-                {
-                    Packet.SerializePacket((Packet)p, "packets.bin");
-                }
 
                 Dispatcher.BeginInvoke(new Action(() => { this.lblStatus.Content = "Done"; }));
             });
@@ -203,13 +195,6 @@ namespace NetworkMonitorApplication
             
             filterWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
             {
-                //Dispatcher.BeginInvoke(new Action(() =>
-                //{
-                //    this.dataGridPackets.Items.Clear();
-                //    this.dataGridPackets.ItemsSource = foundPackets;
-                //}));
-
-                //this.lblFoundPackets.Content = foundPackets.Count.ToString();
                 this.progressBarFiltering.Visibility = Visibility.Collapsed;
             });
             
@@ -254,7 +239,8 @@ namespace NetworkMonitorApplication
 
             getStatsWorker.DoWork += new DoWorkEventHandler((o, args) =>
             {
-                List<Packet> allPackets = monitor.DeserializeAllPackets();
+                PacketSerializer serializer = new PacketSerializer("packets.bin");
+                List<Packet> allPackets = serializer.DeserializeAllPackets();
                 TrafficStatistics statistics = new TrafficStatistics(allPackets);
 
                 switch (timeRange)

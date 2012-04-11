@@ -25,9 +25,12 @@ namespace NetworkMonitor
         private IntPtr buffer;
         private uint bufferSize = 0x10000;
         private int driver = 0;
+
         private bool listening = true;
-        private const int PACKET_BUFFER = 25;
-        private const string PACKET_DATABASE = "packets.bin";
+        private const int PACKET_BUFFER_SIZE = 1000;
+        private List<Packet> packetBuffer = new List<Packet>();
+        private PacketSerializer serializer = new PacketSerializer("packets.bin");
+
         private ulong totalPackets;
         private decimal totalDownloaded;
         private decimal totalUploaded; 
@@ -79,7 +82,6 @@ namespace NetworkMonitor
             }
 
             NtTdiApi.SetLoggingState(driver, 1);
-            //NtTdiApi.SetMaximumLogSize(driver, 100); //limits the packet count to 100
 
             filterInfo = new FILTER_INFO(1,
                 NtTdiApi.EVENT_MASK_FULL,
@@ -136,6 +138,9 @@ namespace NetworkMonitor
             LOG_INFO logInfo;
             string protocol;
 
+            
+            
+
             while (listening)
             {
                 uint bytesRead = bufferSize;
@@ -155,7 +160,26 @@ namespace NetworkMonitor
                         {
                             Packet p = new Packet(logInfo);
                             OnPacketReceived(p);
-                            //Packet.SerializePacket(p, PACKET_DATABASE);
+
+                            packetBuffer.Add(p);
+                            if(packetBuffer.Count == PACKET_BUFFER_SIZE)
+                            {
+                                var packetsToSave = new Packet[PACKET_BUFFER_SIZE];
+                                packetBuffer.CopyTo(packetsToSave);
+                                packetBuffer.Clear();
+
+                                ThreadPool.QueueUserWorkItem((a) =>
+                                {
+                                    lock(serializer)
+                                    {
+                                        foreach (var packet in packetsToSave)
+                                        {
+                                            serializer.SerializePacket(packet);
+                                        }
+                                                                         
+                                    }
+                                });
+                            }
 
                             totalPackets++;
                             NotifyPropertyChanged("TotalPackets");
@@ -212,6 +236,18 @@ namespace NetworkMonitor
         public void PauseListening()
         {
             listening = false;
+            ThreadPool.QueueUserWorkItem((a) =>
+            {
+                lock (serializer)
+                {
+                    foreach (var packet in packetBuffer)
+                    {
+                        serializer.SerializePacket(packet);
+                    }
+
+                }
+            });
+
             Marshal.FreeHGlobal(buffer);
 
             NtTdiApi.SetLoggingState(driver, 0);
@@ -220,30 +256,6 @@ namespace NetworkMonitor
 
             this.DownloadSpeed = 0;
             this.UploadSpeed = 0;
-        }
-
-        public List<Packet> DeserializeAllPackets(string fileName = PACKET_DATABASE)
-        {
-            FileStream fileStream = new FileStream(fileName, FileMode.Open);
-            List<Packet> packets = new List<Packet>();
-
-            BinaryReader binaryReader = new BinaryReader(fileStream);
-            while (fileStream.Position <= fileStream.Length - 1)
-            {
-                int packetSize = binaryReader.ReadInt32();
-
-                if (packetSize != 0)
-                {
-                    byte[] packetData = binaryReader.ReadBytes(packetSize);
-                    MemoryStream packetStream = new MemoryStream();
-                    Packet.DecompressPacket(packetData, out packetStream);
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    Packet p = (Packet)binaryFormatter.Deserialize(packetStream);
-                    packets.Add(p);
-                }
-            }
-
-            return packets;
         }
 
         /// <summary>
@@ -281,7 +293,7 @@ namespace NetworkMonitor
         {
             if (allPackets == null)
             {
-                allPackets = this.DeserializeAllPackets();
+                allPackets = this.serializer.DeserializeAllPackets();
             }
 
             List<Packet> filtered = new List<Packet>();//(from p in allPackets
