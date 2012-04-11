@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -306,6 +307,49 @@ namespace NetworkMonitorApplication
             });
 
             getStatsWorker.RunWorkerAsync();
+        }
+
+        private void btnShowAppStatistics_Click(object sender, RoutedEventArgs e)
+        {
+            progressBarAppStatistics.Visibility = Visibility.Visible;
+            BackgroundWorker statsWorker = new BackgroundWorker();
+            Dictionary<string, long> stats = new Dictionary<string, long>();
+
+            statsWorker.DoWork += new DoWorkEventHandler((o, args) =>
+            {
+                PacketSerializer serializer = new PacketSerializer("packets.bin");
+                TrafficStatistics statistics = new TrafficStatistics(serializer.DeserializeAllPackets());
+                stats = statistics.GetApplicationStatistics();
+            });
+
+            statsWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((o, args) =>
+                                                                                     {
+                                                                                         btnShowAppStatistics.Visibility
+                                                                                             = Visibility.Collapsed;
+                chartApplications.DataContext = stats;
+                progressBarAppStatistics.Visibility = Visibility.Collapsed;
+                chartApplications.Visibility = Visibility.Visible;
+            });
+
+            statsWorker.RunWorkerAsync();
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
+                (int)chartApplications.ActualWidth,
+                (int)chartApplications.ActualHeight,
+                96d,
+                96d,
+                PixelFormats.Pbgra32);
+            renderBitmap.Render(chartApplications);
+
+            using(FileStream outStream = new FileStream("pic.png", FileMode.Create))
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+                encoder.Save(outStream);
+            }
         }
     }
 }
